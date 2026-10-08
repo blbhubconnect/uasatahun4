@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jom Berlatih Tahun 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2b2350;--muted:#6b6490;--bg1:#fff7e6;--bg2:#e9f4ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Baloo 2","Comic Sans MS","Trebuchet MS",system-ui,sans-serif;color:var(--ink);min-height:100vh;
+  background:linear-gradient(160deg,var(--bg1),var(--bg2));overflow-x:hidden}
+.blob{position:fixed;border-radius:50%;opacity:.35;filter:blur(2px);z-index:0;animation:float 9s ease-in-out infinite}
+.b1{width:220px;height:220px;background:#ffc93c;top:-60px;left:-60px}
+.b2{width:180px;height:180px;background:#7c4dff;bottom:-50px;right:-40px;animation-delay:-3s}
+.b3{width:120px;height:120px;background:#22c55e;top:40%;right:-40px;animation-delay:-6s}
+@keyframes float{50%{transform:translateY(-24px) scale(1.06)}}
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:28px 16px 110px}
+header{text-align:center;margin-bottom:22px}
+.mascot{font-size:72px;display:inline-block;animation:wave 2.4s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+h1{font-size:clamp(38px,7vw,58px);line-height:1.05;font-weight:800}
+h1 span{color:#7c4dff}
+.sub{font-size:clamp(22px,4vw,28px);color:var(--muted);font-weight:700;margin-top:6px}
+.steps{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:16px 0 4px}
+.steps span{background:#fff;border:3px solid #e9e3ff;border-radius:999px;padding:4px 14px;font-size:20px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:22px}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+.card{--c:#7c4dff;--cl:#efe8ff;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;
+  background:#fff;border-radius:28px;padding:22px 18px 20px;text-decoration:none;color:var(--ink);
+  border:4px solid var(--cl);box-shadow:0 8px 0 var(--cl),0 14px 26px rgba(43,35,80,.10);
+  transition:transform .18s,box-shadow .18s;animation:pop .5s backwards}
+.card:nth-child(2){animation-delay:.08s}.card:nth-child(3){animation-delay:.16s}.card:nth-child(4){animation-delay:.24s}
+@keyframes pop{from{opacity:0;transform:translateY(24px) scale(.95)}}
+.card:hover,.card:focus-visible{transform:translateY(-6px) rotate(-1deg);box-shadow:0 14px 0 var(--cl),0 20px 30px rgba(43,35,80,.16);outline:none}
+.card:active{transform:translateY(2px);box-shadow:0 3px 0 var(--cl)}
+.icon{width:110px;height:110px;border-radius:50%;background:var(--cl);display:grid;place-items:center;font-size:62px}
+.card:hover .icon{animation:jig .5s}
+@keyframes jig{25%{transform:rotate(-12deg) scale(1.1)}75%{transform:rotate(12deg) scale(1.1)}}
+.name{font-size:32px;font-weight:800;line-height:1.1}
+.info{font-size:20px;color:var(--muted);font-weight:700}
+.go{margin-top:8px;background:var(--c);color:#fff;font-size:24px;font-weight:800;border-radius:999px;padding:8px 28px;
+  box-shadow:0 5px 0 rgba(0,0,0,.18)}
+.bm{--c:#7c4dff;--cl:#efe8ff}.bi{--c:#2f80ed;--cl:#e3efff}.mt{--c:#f57c00;--cl:#fff0dd}.sn{--c:#16a34a;--cl:#e3f8ea}
+.note{text-align:center;margin-top:26px;font-size:20px;color:var(--muted);font-weight:700}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+<div class="wrap">
+  <header>
+    <div class="mascot">🎒</div>
+    <h1>Jom <span>Berlatih!</span></h1>
+    <div class="sub">Tahun 4 · Pilih subjek kamu 👇</div>
+    <div class="steps"><span>📖 Belajar</span><span>✏️ Cuba</span><span>💡 Petunjuk</span><span>✅ Semak</span><span>🔧 Baiki</span><span>🚀 Maju</span></div>
+  </header>
+
+  <nav class="grid">
+    <a class="card bm" href="latihan-bahasa-melayu-tahun4.html" target="_blank" rel="noopener">
+      <div class="icon">🦉</div><div class="name">Bahasa Melayu</div><div class="info">📝 17 soalan</div><div class="go">Mula 🚀</div></a>
+    <a class="card bi" href="bi-tahun4-latihan.html" target="_blank" rel="noopener">
+      <div class="icon">🦁</div><div class="name">English</div><div class="info">📝 25 soalan</div><div class="go">Mula 🚀</div></a>
+    <a class="card mt" href="matematik-tahun4-uasa.html" target="_blank" rel="noopener">
+      <div class="icon">🧮</div><div class="name">Matematik</div><div class="info">📝 20 soalan</div><div class="go">Mula 🚀</div></a>
+    <a class="card sn" href="sains-tahun4.html" target="_blank" rel="noopener">
+      <div class="icon">🔬</div><div class="name">Sains</div><div class="info">📝 32 soalan</div><div class="go">Mula 🚀</div></a>
+  </nav>
+
+  <p class="note">💡 1 petunjuk setiap soalan · 🎯 Jawab sekali sahaja · ⭐ Markah penuh 100</p>
+</div>
+<!-- ===== BUNYI-KIT: muzik latar fokus + kesan bunyi (Web Audio, tiada fail luar) ===== -->
+<style>
+.sk-ctrl{position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:8px;background:rgba(255,255,255,.92);
+  padding:6px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.sk-ctrl button{width:54px;height:54px;border-radius:50%;border:3px solid #e6e8f0;background:#fff;font-size:26px;
+  cursor:pointer;transition:transform .15s;line-height:1;font-family:inherit}
+.sk-ctrl button:hover{transform:scale(1.08)}
+.sk-ctrl button.off{background:#eee;filter:grayscale(1);opacity:.6}
+.sk-ctrl button.on.mus{animation:skPulse 1.4s ease-in-out infinite}
+@keyframes skPulse{50%{transform:scale(1.07)}}
+@media (max-width:520px){.sk-ctrl button{width:46px;height:46px;font-size:22px}}
+</style>
+<script>
+(function(){
+  const store={get(k,d){try{const v=localStorage.getItem("sk_"+k);return v===null?d:v==="1"}catch(e){return d}},
+               set(k,v){try{localStorage.setItem("sk_"+k,v?"1":"0")}catch(e){}}};
+  let ctx=null,master,musicBus,sfxBus,comp,noiseBuf=null,timer=null;
+  let musicOn=store.get("music",true),sfxOn=store.get("sfx",true),playing=false,wantMusic=false;
+  const MUSIC_VOL=.22,BPM=76,STEP=60/BPM/2; // 1 langkah = not 1/8
+  let step=0,nextT=0,loop=0;
+
+  function init(){
+    if(ctx) return ctx.state==="suspended"&&ctx.resume();
+    try{ctx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}
+    comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;comp.connect(ctx.destination);
+    master=ctx.createGain();master.gain.value=.9;master.connect(comp);
+    musicBus=ctx.createGain();musicBus.gain.value=0;musicBus.connect(master);
+    sfxBus=ctx.createGain();sfxBus.gain.value=sfxOn?.55:0;sfxBus.connect(master);
+    noiseBuf=ctx.createBuffer(1,ctx.sampleRate*.5,ctx.sampleRate);
+    const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  }
+  const hz=m=>440*Math.pow(2,(m-69)/12);
+
+  /* ---- alat bunyi asas ---- */
+  function note(bus,midi,t,dur,{type="sine",vol=.2,att=.008,cut=0,detune=0}={}){
+    const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=hz(midi);o.detune.value=detune;
+    let out=o;
+    if(cut){const f=ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=cut;o.connect(f);out=f}
+    out.connect(g);g.connect(bus);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);
+    g.gain.exponentialRampToValueAtTime(.0008,t+dur);o.start(t);o.stop(t+dur+.05);
+  }
+  function mallet(bus,midi,t,vol=.16,dur=.9){ // bunyi seperti marimba/kalimba
+    note(bus,midi,t,dur,{type:"sine",vol});
+    note(bus,midi+12,t,dur*.35,{type:"sine",vol:vol*.25});
+  }
+  function noise(bus,t,dur,vol,freq,type="highpass"){
+    const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=noiseBuf;
+    f.type=type;f.frequency.value=freq;s.connect(f);f.connect(g);g.connect(bus);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0008,t+dur);s.start(t);s.stop(t+dur+.02);
+  }
+  function glide(bus,f1,f2,t,dur,vol,type="sine"){
+    const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;
+    o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    o.connect(g);g.connect(bus);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.02);
+    g.gain.exponentialRampToValueAtTime(.0008,t+dur);o.start(t);o.stop(t+dur+.05);
+  }
+
+  /* ---- MUZIK LATAR: tenang, pentatonik, ~76 BPM, tiada lirik → bantu fokus & berfikir ---- */
+  // Progresi C – Am – F – G (setiap satu 1 bar = 8 langkah)
+  const CHORDS=[[48,[60,64,67,72]],[45,[57,60,64,69]],[41,[57,60,65,69]],[43,[55,59,62,67]]];
+  const PENTA=[72,74,76,79,81,84];
+  const PATTERNS=[[0,2,1,3,2,1,0,2],[0,1,2,3,2,3,1,2],[3,2,1,0,1,2,3,1],[0,2,3,2,1,2,0,1]];
+  let pat=PATTERNS[0],melody=[];
+  function newPhrase(){
+    pat=PATTERNS[Math.floor(Math.random()*PATTERNS.length)];
+    // melodi ringkas & jarang (ruang untuk berfikir)
+    melody=[];for(let i=0;i<32;i++)melody.push(Math.random()<.16?PENTA[Math.floor(Math.random()*PENTA.length)]:0);
+  }
+  function scheduleStep(s,t){
+    const bar=Math.floor(s/8)%4,pos=s%8,[bass,ch]=CHORDS[bar];
+    if(pos===0){ // pad lembut + bass
+      ch.slice(0,3).forEach((m,k)=>note(musicBus,m,t,STEP*8.2,{type:"triangle",vol:.035,att:.5,cut:900,detune:k*4-4}));
+      note(musicBus,bass,t,STEP*3.5,{type:"sine",vol:.16,att:.02});
+    }
+    if(pos===4) note(musicBus,bass+7,t,STEP*3,{type:"sine",vol:.09,att:.02});
+    mallet(musicBus,ch[pat[pos]],t,pos%2?.06:.085,.7);         // arpeggio (detik jam yang stabil)
+    const m=melody[s%32];if(m&&loop%2===1) mallet(musicBus,m,t+.01,.07,1.2); // melodi muncul setiap pusingan ke-2
+    if(pos%2===1) noise(musicBus,t,.04,.012,7000);              // hi-hat sangat perlahan
+    if(pos===0&&bar===0&&s%32===0){loop++;if(loop%2===1)newPhrase()}
+  }
+  function tick(){
+    if(!ctx||!playing)return;
+    while(nextT<ctx.currentTime+.15){scheduleStep(step,nextT);step++;nextT+=STEP}
+  }
+  function startMusic(){
+    wantMusic=true;if(!musicOn)return;init();if(!ctx||playing)return;
+    playing=true;newPhrase();step=0;nextT=ctx.currentTime+.08;
+    musicBus.gain.cancelScheduledValues(ctx.currentTime);
+    musicBus.gain.setValueAtTime(0,ctx.currentTime);musicBus.gain.linearRampToValueAtTime(MUSIC_VOL,ctx.currentTime+2);
+    timer=setInterval(tick,25);
+  }
+  function stopMusic(fade=.8){
+    if(!ctx||!playing)return;playing=false;
+    const t=ctx.currentTime;musicBus.gain.cancelScheduledValues(t);
+    musicBus.gain.setValueAtTime(musicBus.gain.value,t);musicBus.gain.linearRampToValueAtTime(0,t+fade);
+    setTimeout(()=>{if(!playing)clearInterval(timer)},fade*1000+50);
+  }
+  function duck(len=1){ // perlahankan muzik sekejap supaya SFX jelas
+    if(!ctx||!playing)return;const t=ctx.currentTime,g=musicBus.gain;
+    g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(MUSIC_VOL*.3,t+.06);
+    g.setValueAtTime(MUSIC_VOL*.3,t+len);g.linearRampToValueAtTime(MUSIC_VOL,t+len+.8);
+  }
+
+  /* ---- KESAN BUNYI ---- */
+  const FX={
+    pick(t){mallet(sfxBus,79,t,.18,.25);note(sfxBus,86,t+.04,.12,{vol:.05})},          // "tik" pilih jawapan
+    type(t){note(sfxBus,88,t,.05,{type:"triangle",vol:.05})},                           // taip nombor/huruf
+    question(t){ // motif "hmm?" — dua not naik seperti soalan → cetus rasa ingin tahu
+      mallet(sfxBus,67,t,.13,.5);mallet(sfxBus,72,t+.16,.13,.5);mallet(sfxBus,74,t+.32,.15,.9);
+      note(sfxBus,86,t+.32,.6,{vol:.03})},
+    hint(t){ // mentol menyala ✨ — kilauan naik
+      [76,79,83,88,91].forEach((m,k)=>note(sfxBus,m,t+k*.06,.5,{type:"triangle",vol:.08}));
+      glide(sfxBus,600,1800,t,.35,.04)},
+    check(t){ // "drumroll" kecil — debaran sebelum keputusan
+      for(let k=0;k<6;k++)noise(sfxBus,t+k*.045,.05,.05+k*.012,2500,"bandpass")},
+    correct(t){ // 🎉 arpeggio ceria + kilauan
+      [72,76,79,84].forEach((m,k)=>mallet(sfxBus,m,t+.25+k*.09,.2,.7));
+      note(sfxBus,88,t+.62,1,{type:"triangle",vol:.07});note(sfxBus,91,t+.7,1,{type:"triangle",vol:.05});
+      noise(sfxBus,t+.6,.5,.03,8000)},
+    partial(t){ // 👍 hampir — naik tapi tak sampai penuh
+      [72,76,79].forEach((m,k)=>mallet(sfxBus,m,t+.25+k*.1,.17,.6));mallet(sfxBus,77,t+.6,.12,.7)},
+    wrong(t){ // 😅 lembut, tak menakutkan — "bwomp" turun + boing
+      glide(sfxBus,330,180,t+.25,.45,.14,"triangle");glide(sfxBus,220,150,t+.5,.4,.1,"sine");
+      note(sfxBus,64,t+.95,.3,{type:"sine",vol:.06})},
+    next(t){ // whoosh ke soalan baharu
+      glide(sfxBus,300,900,t,.22,.04,"sine");noise(sfxBus,t,.25,.035,1500,"bandpass")},
+    start(t){[60,64,67,72,76].forEach((m,k)=>mallet(sfxBus,m,t+k*.08,.18,.6))},
+    finish(t){ // 🏆 fanfare
+      [[60,0],[64,.12],[67,.24],[72,.36],[67,.6],[72,.72]].forEach(([m,d])=>{mallet(sfxBus,m,t+d,.2,.6);note(sfxBus,m-12,t+d,.4,{type:"triangle",vol:.05})});
+      [72,76,79,84].forEach(m=>note(sfxBus,m,t+.9,1.8,{type:"triangle",vol:.05,att:.05}));noise(sfxBus,t+.9,1,.03,8000)},
+    hover(t){note(sfxBus,84,t,.08,{type:"sine",vol:.035})}
+  };
+  const DUCK={correct:1.6,partial:1.4,wrong:1.6,finish:2.8,hint:.8,question:1};
+  function play(name){
+    if(!sfxOn)return;init();if(!ctx||!FX[name])return;
+    FX[name](ctx.currentTime+.01);if(DUCK[name])duck(DUCK[name]);
+  }
+
+  /* ---- butang kawalan ---- */
+  function ui(){
+    const w=document.createElement("div");w.className="sk-ctrl";
+    w.innerHTML=`<button type="button" class="mus" id="skMus" aria-label="Muzik latar" title="Muzik latar">🎵</button>
+                 <button type="button" id="skSfx" aria-label="Kesan bunyi" title="Kesan bunyi">🔊</button>`;
+    document.body.appendChild(w);
+    const bm=w.querySelector("#skMus"),bs=w.querySelector("#skSfx");
+    const paint=()=>{bm.className="mus "+(musicOn?"on":"off");bs.className=sfxOn?"on":"off";bs.textContent=sfxOn?"🔊":"🔇"};
+    bm.onclick=()=>{musicOn=!musicOn;store.set("music",musicOn);
+      if(musicOn){wantMusic=true;startMusic()}else stopMusic(.4);paint()};
+    bs.onclick=()=>{sfxOn=!sfxOn;store.set("sfx",sfxOn);init();
+      if(ctx)sfxBus.gain.setTargetAtTime(sfxOn?.55:0,ctx.currentTime,.02);if(sfxOn)play("pick");paint()};
+    paint();
+  }
+  if(document.body)ui();else document.addEventListener("DOMContentLoaded",ui);
+
+  /* pilih jawapan & taip → bunyi automatik */
+  document.addEventListener("click",e=>{
+    const b=e.target.closest(".opt,.w,.choice,.step,.chip,.tab,.bbtns button");
+    if(b&&!b.disabled)play("pick");
+  },true);
+  document.addEventListener("input",e=>{if(e.target.matches("input"))play("type")},true);
+
+  /* hentikan muzik bila tab disembunyi, sambung bila kembali */
+  document.addEventListener("visibilitychange",()=>{
+    if(!ctx)return;if(document.hidden)ctx.suspend();else ctx.resume();
+  });
+
+  window.SFX={play,startMusic,stopMusic,
+    begin(){init();play("start");setTimeout(startMusic,500)}, // dipanggil bila murid tekan "Mula"
+    result(k){play("check");play(k)},                       // k = "correct" | "partial" | "wrong"
+    nextQ(){play("next");setTimeout(()=>play("question"),260)},
+    hint(){play("hint")},
+    end(){play("finish");stopMusic(2.5)}};
+})();
+</script>
+<!-- ===== /BUNYI-KIT ===== -->
+
+<script>
+/* muzik mula selepas sentuhan pertama (pelayar sekat autoplay) */
+let started=false;
+document.addEventListener("pointerdown",()=>{if(!started){started=true;SFX.startMusic()}},{once:false});
+document.querySelectorAll(".card").forEach(c=>{
+  c.addEventListener("mouseenter",()=>SFX.play("hover"));
+  c.addEventListener("click",()=>SFX.play("start"));
+});
+</script>
+</body>
+</html>

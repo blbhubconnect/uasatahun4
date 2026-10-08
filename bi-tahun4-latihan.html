@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Year 4 – Fun Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#ffe9a8; --bg2:#ffc9de; --card:#ffffff; --ink:#2b2d42;
+    --blue:#4d96ff; --green:#2ec27e; --red:#ff5d5d; --yellow:#ffd93d; --purple:#9b5de5; --orange:#ff9f1c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; font-family:"Baloo 2","Comic Sans MS","Trebuchet MS",sans-serif;
+    color:var(--ink); font-size:22px; line-height:1.4;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2)); padding:16px;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:820px; margin:0 auto}
+  .card{background:var(--card); border-radius:28px; padding:24px; box-shadow:0 10px 0 rgba(0,0,0,.08), 0 14px 30px rgba(0,0,0,.12); position:relative}
+  h1{font-size:44px; margin:0 0 8px; color:var(--purple); text-align:center}
+  h2{font-size:30px; margin:0 0 10px}
+  .center{text-align:center}
+  .big-emoji{font-size:80px; text-align:center; animation:bob 2s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-10px)}}
+  .pill-row{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:16px 0}
+  .pill{background:#f1ecff; color:var(--purple); padding:8px 16px; border-radius:999px; font-weight:700; font-size:20px}
+  .btn{
+    font-family:inherit; font-size:26px; font-weight:800; border:none; cursor:pointer;
+    padding:14px 30px; border-radius:20px; color:#fff; background:var(--blue);
+    box-shadow:0 6px 0 rgba(0,0,0,.18); transition:transform .1s;
+  }
+  .btn:active{transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,.18)}
+  .btn:disabled{opacity:.45; cursor:not-allowed}
+  .btn.go{background:var(--green)} .btn.hint{background:var(--yellow); color:var(--ink)} .btn.next{background:var(--purple)}
+
+  /* top bar */
+  .top{display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap}
+  .qnum{background:var(--purple); color:#fff; font-weight:800; border-radius:16px; padding:6px 14px; font-size:22px}
+  .bar{flex:1; min-width:140px; height:20px; background:#fff; border-radius:999px; overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,.1)}
+  .bar i{display:block; height:100%; background:linear-gradient(90deg,var(--green),var(--yellow)); transition:width .4s}
+  .score{background:#fff; border-radius:16px; padding:6px 14px; font-weight:800; font-size:22px}
+
+  .part-tag{display:inline-block; background:var(--orange); color:#fff; font-weight:800; padding:4px 14px; border-radius:12px; font-size:20px; margin-bottom:8px}
+  .instr{font-size:20px; color:#555; margin-bottom:12px}
+
+  /* stimulus */
+  .stim{background:#fffbea; border:3px dashed #ffd27a; border-radius:20px; padding:16px; margin-bottom:16px; font-size:21px; max-height:46vh; overflow:auto}
+  .poster{text-align:center}
+  .poster .tag{display:inline-block; border:3px solid var(--ink); border-radius:14px; padding:2px 18px; font-weight:800; font-size:26px}
+  .poster h3{margin:8px 0; font-size:26px}
+  .poster .row{display:flex; justify-content:space-around; font-weight:800; margin-top:8px}
+  .emo{font-size:40px; margin-top:6px}
+  .mail{border:3px solid var(--ink); border-radius:12px; background:#fff; overflow:hidden}
+  .mail .h{border-bottom:2px solid var(--ink); padding:6px 12px; font-weight:700}
+  .mail .b{padding:10px 12px}
+  .note{background:#fff7b0; padding:16px; border-radius:6px; transform:rotate(-1deg); box-shadow:3px 4px 0 rgba(0,0,0,.1)}
+  .chat{display:flex; flex-direction:column; gap:8px}
+  .msg{max-width:85%; padding:8px 14px; border-radius:18px}
+  .msg b{display:block; font-size:17px}
+  .msg.l{background:#dff0ff; align-self:flex-start}
+  .msg.r{background:#e3ffe8; align-self:flex-end}
+  .chart{display:flex; align-items:flex-end; gap:6px; height:220px; padding:8px 4px 0; border-bottom:3px solid var(--ink)}
+  .chart .c{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%}
+  .chart .v{font-size:16px; font-weight:800}
+  .chart .b{width:100%; background:var(--blue); border-radius:6px 6px 0 0}
+  .chart-x{display:flex; gap:6px; padding:0 4px}
+  .chart-x span{flex:1; text-align:center; font-size:14px; font-weight:700}
+  .cap{text-align:center; font-size:18px; margin-top:8px}
+  .blank{background:#eee; border-radius:8px; padding:0 8px; font-weight:800}
+  .blank.now{background:var(--yellow); animation:pulse 1.2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(255,217,61,.4)}}
+  .tabs{display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap}
+  .tab{font-family:inherit; font-size:20px; font-weight:800; border:3px solid var(--purple); background:#fff; color:var(--purple); border-radius:14px; padding:4px 14px; cursor:pointer}
+  .tab.on{background:var(--purple); color:#fff}
+
+  .question{font-size:28px; font-weight:800; margin:6px 0 16px}
+  .opts{display:grid; gap:12px}
+  .opt{
+    font-family:inherit; font-size:24px; text-align:left; display:flex; align-items:center; gap:14px;
+    background:#f4f8ff; border:4px solid #cfe0ff; border-radius:20px; padding:12px 16px; cursor:pointer; color:var(--ink);
+    transition:transform .15s, border-color .15s;
+  }
+  .opt:hover{transform:scale(1.02)}
+  .opt .L{flex:none; width:44px; height:44px; border-radius:50%; background:var(--blue); color:#fff; font-weight:800; display:grid; place-items:center}
+  .opt.sel{border-color:var(--blue); background:#e2edff}
+  .opt.ok{border-color:var(--green); background:#dcffe9; animation:pop .5s}
+  .opt.ok .L{background:var(--green)}
+  .opt.bad{border-color:var(--red); background:#ffe3e3; animation:shake .5s}
+  .opt.bad .L{background:var(--red)}
+  .opt:disabled{cursor:default}
+  .opt:disabled:hover{transform:none}
+
+  .spell{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:10px 0 6px}
+  .lb{width:54px; height:64px; border-radius:14px; border:4px solid #cfe0ff; font-family:inherit; font-size:34px; font-weight:800; text-align:center; text-transform:lowercase; color:var(--ink); background:#f4f8ff}
+  .lb.fixed{background:var(--yellow); border-color:var(--yellow)}
+  .lb:focus{outline:none; border-color:var(--blue)}
+  .spell.ok .lb{border-color:var(--green); background:#dcffe9}
+  .spell.ok{animation:pop .5s}
+  .spell.bad .lb{border-color:var(--red); background:#ffe3e3}
+  .spell.bad{animation:shake .5s}
+
+  .actions{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px}
+  .hintbox{margin-top:16px; background:#fff6c7; border-left:8px solid var(--yellow); border-radius:14px; padding:12px 16px; font-size:22px; animation:slide .4s}
+  @keyframes slide{from{opacity:0; transform:translateY(-8px)}}
+
+  .fb{margin-top:16px; text-align:center; font-size:32px; font-weight:800; border-radius:20px; padding:10px}
+  .fb.ok{color:var(--green); animation:pop .5s}
+  .fb.bad{color:var(--red); animation:shake .5s}
+  @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+  .card.wrong-flash{animation:flash .6s}
+  @keyframes flash{30%{box-shadow:0 0 0 8px rgba(255,93,93,.5)}}
+
+  .confetti{position:fixed; top:-20px; width:14px; height:20px; border-radius:4px; pointer-events:none; z-index:99; animation:fall 1.8s ease-in forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+  .floaty{position:fixed; font-size:60px; pointer-events:none; z-index:99; animation:up 1.2s ease-out forwards}
+  @keyframes up{to{transform:translateY(-160px); opacity:0}}
+
+  .stars{font-size:70px; text-align:center; letter-spacing:8px}
+  .stars span{display:inline-block; animation:pop .6s both}
+  .final{font-size:64px; font-weight:800; text-align:center; color:var(--purple)}
+  .dots{display:grid; grid-template-columns:repeat(auto-fill,minmax(56px,1fr)); gap:10px; margin-top:16px}
+  .dot{height:56px; border-radius:16px; display:grid; place-items:center; color:#fff; font-weight:800; font-size:22px}
+  .dot.y{background:var(--green)} .dot.n{background:var(--red)}
+  .partsum{display:grid; gap:8px; margin-top:16px}
+  .partsum div{display:flex; justify-content:space-between; background:#f4f8ff; border-radius:14px; padding:8px 16px; font-weight:700}
+
+  @media (max-width:560px){
+    body{font-size:20px; padding:10px}
+    .card{padding:18px}
+    h1{font-size:34px}
+    .question{font-size:24px}
+    .opt{font-size:21px}
+    .lb{width:42px; height:54px; font-size:28px}
+    .chart{height:170px; gap:3px}
+    .chart-x{gap:3px}
+    .chart-x span{font-size:11px}
+    .chart .v{font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<!-- ===== BUNYI-KIT: muzik latar fokus + kesan bunyi (Web Audio, tiada fail luar) ===== -->
+<style>
+.sk-ctrl{position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:8px;background:rgba(255,255,255,.92);
+  padding:6px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.sk-ctrl button{width:54px;height:54px;border-radius:50%;border:3px solid #e6e8f0;background:#fff;font-size:26px;
+  cursor:pointer;transition:transform .15s;line-height:1;font-family:inherit}
+.sk-ctrl button:hover{transform:scale(1.08)}
+.sk-ctrl button.off{background:#eee;filter:grayscale(1);opacity:.6}
+.sk-ctrl button.on.mus{animation:skPulse 1.4s ease-in-out infinite}
+@keyframes skPulse{50%{transform:scale(1.07)}}
+@media (max-width:520px){.sk-ctrl button{width:46px;height:46px;font-size:22px}}
+</style>
+<script>
+(function(){
+  const store={get(k,d){try{const v=localStorage.getItem("sk_"+k);return v===null?d:v==="1"}catch(e){return d}},
+               set(k,v){try{localStorage.setItem("sk_"+k,v?"1":"0")}catch(e){}}};
+  let ctx=null,master,musicBus,sfxBus,comp,noiseBuf=null,timer=null;
+  let musicOn=store.get("music",true),sfxOn=store.get("sfx",true),playing=false,wantMusic=false;
+  const MUSIC_VOL=.22,BPM=76,STEP=60/BPM/2; // 1 langkah = not 1/8
+  let step=0,nextT=0,loop=0;
+
+  function init(){
+    if(ctx) return ctx.state==="suspended"&&ctx.resume();
+    try{ctx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}
+    comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;comp.connect(ctx.destination);
+    master=ctx.createGain();master.gain.value=.9;master.connect(comp);
+    musicBus=ctx.createGain();musicBus.gain.value=0;musicBus.connect(master);
+    sfxBus=ctx.createGain();sfxBus.gain.value=sfxOn?.55:0;sfxBus.connect(master);
+    noiseBuf=ctx.createBuffer(1,ctx.sampleRate*.5,ctx.sampleRate);
+    const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  }
+  const hz=m=>440*Math.pow(2,(m-69)/12);
+
+  /* ---- alat bunyi asas ---- */
+  function note(bus,midi,t,dur,{type="sine",vol=.2,att=.008,cut=0,detune=0}={}){
+    const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=hz(midi);o.detune.value=detune;
+    let out=o;
+    if(cut){const f=ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=cut;o.connect(f);out=f}
+    out.connect(g);g.connect(bus);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);
+    g.gain.exponentialRampToValueAtTime(.0008,t+dur);o.start(t);o.stop(t+dur+.05);
+  }
+  function mallet(bus,midi,t,vol=.16,dur=.9){ // bunyi seperti marimba/kalimba
+    note(bus,midi,t,dur,{type:"sine",vol});
+    note(bus,midi+12,t,dur*.35,{type:"sine",vol:vol*.25});
+  }
+  function noise(bus,t,dur,vol,freq,type="highpass"){
+    const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=noiseBuf;
+    f.type=type;f.frequency.value=freq;s.connect(f);f.connect(g);g.connect(bus);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0008,t+dur);s.start(t);s.stop(t+dur+.02);
+  }
+  function glide(bus,f1,f2,t,dur,vol,type="sine"){
+    const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;
+    o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    o.connect(g);g.connect(bus);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.02);
+    g.gain.exponentialRampToValueAtTime(.0008,t+dur);o.start(t);o.stop(t+dur+.05);
+  }
+
+  /* ---- MUZIK LATAR: tenang, pentatonik, ~76 BPM, tiada lirik → bantu fokus & berfikir ---- */
+  // Progresi C – Am – F – G (setiap satu 1 bar = 8 langkah)
+  const CHORDS=[[48,[60,64,67,72]],[45,[57,60,64,69]],[41,[57,60,65,69]],[43,[55,59,62,67]]];
+  const PENTA=[72,74,76,79,81,84];
+  const PATTERNS=[[0,2,1,3,2,1,0,2],[0,1,2,3,2,3,1,2],[3,2,1,0,1,2,3,1],[0,2,3,2,1,2,0,1]];
+  let pat=PATTERNS[0],melody=[];
+  function newPhrase(){
+    pat=PATTERNS[Math.floor(Math.random()*PATTERNS.length)];
+    // melodi ringkas & jarang (ruang untuk berfikir)
+    melody=[];for(let i=0;i<32;i++)melody.push(Math.random()<.16?PENTA[Math.floor(Math.random()*PENTA.length)]:0);
+  }
+  function scheduleStep(s,t){
+    const bar=Math.floor(s/8)%4,pos=s%8,[bass,ch]=CHORDS[bar];
+    if(pos===0){ // pad lembut + bass
+      ch.slice(0,3).forEach((m,k)=>note(musicBus,m,t,STEP*8.2,{type:"triangle",vol:.035,att:.5,cut:900,detune:k*4-4}));
+      note(musicBus,bass,t,STEP*3.5,{type:"sine",vol:.16,att:.02});
+    }
+    if(pos===4) note(musicBus,bass+7,t,STEP*3,{type:"sine",vol:.09,att:.02});
+    mallet(musicBus,ch[pat[pos]],t,pos%2?.06:.085,.7);         // arpeggio (detik jam yang stabil)
+    const m=melody[s%32];if(m&&loop%2===1) mallet(musicBus,m,t+.01,.07,1.2); // melodi muncul setiap pusingan ke-2
+    if(pos%2===1) noise(musicBus,t,.04,.012,7000);              // hi-hat sangat perlahan
+    if(pos===0&&bar===0&&s%32===0){loop++;if(loop%2===1)newPhrase()}
+  }
+  function tick(){
+    if(!ctx||!playing)return;
+    while(nextT<ctx.currentTime+.15){scheduleStep(step,nextT);step++;nextT+=STEP}
+  }
+  function startMusic(){
+    wantMusic=true;if(!musicOn)return;init();if(!ctx||playing)return;
+    playing=true;newPhrase();step=0;nextT=ctx.currentTime+.08;
+    musicBus.gain.cancelScheduledValues(ctx.currentTime);
+    musicBus.gain.setValueAtTime(0,ctx.currentTime);musicBus.gain.linearRampToValueAtTime(MUSIC_VOL,ctx.currentTime+2);
+    timer=setInterval(tick,25);
+  }
+  function stopMusic(fade=.8){
+    if(!ctx||!playing)return;playing=false;
+    const t=ctx.currentTime;musicBus.gain.cancelScheduledValues(t);
+    musicBus.gain.setValueAtTime(musicBus.gain.value,t);musicBus.gain.linearRampToValueAtTime(0,t+fade);
+    setTimeout(()=>{if(!playing)clearInterval(timer)},fade*1000+50);
+  }
+  function duck(len=1){ // perlahankan muzik sekejap supaya SFX jelas
+    if(!ctx||!playing)return;const t=ctx.currentTime,g=musicBus.gain;
+    g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(MUSIC_VOL*.3,t+.06);
+    g.setValueAtTime(MUSIC_VOL*.3,t+len);g.linearRampToValueAtTime(MUSIC_VOL,t+len+.8);
+  }
+
+  /* ---- KESAN BUNYI ---- */
+  const FX={
+    pick(t){mallet(sfxBus,79,t,.18,.25);note(sfxBus,86,t+.04,.12,{vol:.05})},          // "tik" pilih jawapan
+    type(t){note(sfxBus,88,t,.05,{type:"triangle",vol:.05})},                           // taip nombor/huruf
+    question(t){ // motif "hmm?" — dua not naik seperti soalan → cetus rasa ingin tahu
+      mallet(sfxBus,67,t,.13,.5);mallet(sfxBus,72,t+.16,.13,.5);mallet(sfxBus,74,t+.32,.15,.9);
+      note(sfxBus,86,t+.32,.6,{vol:.03})},
+    hint(t){ // mentol menyala ✨ — kilauan naik
+      [76,79,83,88,91].forEach((m,k)=>note(sfxBus,m,t+k*.06,.5,{type:"triangle",vol:.08}));
+      glide(sfxBus,600,1800,t,.35,.04)},
+    check(t){ // "drumroll" kecil — debaran sebelum keputusan
+      for(let k=0;k<6;k++)noise(sfxBus,t+k*.045,.05,.05+k*.012,2500,"bandpass")},
+    correct(t){ // 🎉 arpeggio ceria + kilauan
+      [72,76,79,84].forEach((m,k)=>mallet(sfxBus,m,t+.25+k*.09,.2,.7));
+      note(sfxBus,88,t+.62,1,{type:"triangle",vol:.07});note(sfxBus,91,t+.7,1,{type:"triangle",vol:.05});
+      noise(sfxBus,t+.6,.5,.03,8000)},
+    partial(t){ // 👍 hampir — naik tapi tak sampai penuh
+      [72,76,79].forEach((m,k)=>mallet(sfxBus,m,t+.25+k*.1,.17,.6));mallet(sfxBus,77,t+.6,.12,.7)},
+    wrong(t){ // 😅 lembut, tak menakutkan — "bwomp" turun + boing
+      glide(sfxBus,330,180,t+.25,.45,.14,"triangle");glide(sfxBus,220,150,t+.5,.4,.1,"sine");
+      note(sfxBus,64,t+.95,.3,{type:"sine",vol:.06})},
+    next(t){ // whoosh ke soalan baharu
+      glide(sfxBus,300,900,t,.22,.04,"sine");noise(sfxBus,t,.25,.035,1500,"bandpass")},
+    start(t){[60,64,67,72,76].forEach((m,k)=>mallet(sfxBus,m,t+k*.08,.18,.6))},
+    finish(t){ // 🏆 fanfare
+      [[60,0],[64,.12],[67,.24],[72,.36],[67,.6],[72,.72]].forEach(([m,d])=>{mallet(sfxBus,m,t+d,.2,.6);note(sfxBus,m-12,t+d,.4,{type:"triangle",vol:.05})});
+      [72,76,79,84].forEach(m=>note(sfxBus,m,t+.9,1.8,{type:"triangle",vol:.05,att:.05}));noise(sfxBus,t+.9,1,.03,8000)},
+    hover(t){note(sfxBus,84,t,.08,{type:"sine",vol:.035})}
+  };
+  const DUCK={correct:1.6,partial:1.4,wrong:1.6,finish:2.8,hint:.8,question:1};
+  function play(name){
+    if(!sfxOn)return;init();if(!ctx||!FX[name])return;
+    FX[name](ctx.currentTime+.01);if(DUCK[name])duck(DUCK[name]);
+  }
+
+  /* ---- butang kawalan ---- */
+  function ui(){
+    const w=document.createElement("div");w.className="sk-ctrl";
+    w.innerHTML=`<button type="button" class="mus" id="skMus" aria-label="Muzik latar" title="Muzik latar">🎵</button>
+                 <button type="button" id="skSfx" aria-label="Kesan bunyi" title="Kesan bunyi">🔊</button>`;
+    document.body.appendChild(w);
+    const bm=w.querySelector("#skMus"),bs=w.querySelector("#skSfx");
+    const paint=()=>{bm.className="mus "+(musicOn?"on":"off");bs.className=sfxOn?"on":"off";bs.textContent=sfxOn?"🔊":"🔇"};
+    bm.onclick=()=>{musicOn=!musicOn;store.set("music",musicOn);
+      if(musicOn){wantMusic=true;startMusic()}else stopMusic(.4);paint()};
+    bs.onclick=()=>{sfxOn=!sfxOn;store.set("sfx",sfxOn);init();
+      if(ctx)sfxBus.gain.setTargetAtTime(sfxOn?.55:0,ctx.currentTime,.02);if(sfxOn)play("pick");paint()};
+    paint();
+  }
+  if(document.body)ui();else document.addEventListener("DOMContentLoaded",ui);
+
+  /* pilih jawapan & taip → bunyi automatik */
+  document.addEventListener("click",e=>{
+    const b=e.target.closest(".opt,.w,.choice,.step,.chip,.tab,.bbtns button");
+    if(b&&!b.disabled)play("pick");
+  },true);
+  document.addEventListener("input",e=>{if(e.target.matches("input"))play("type")},true);
+
+  /* hentikan muzik bila tab disembunyi, sambung bila kembali */
+  document.addEventListener("visibilitychange",()=>{
+    if(!ctx)return;if(document.hidden)ctx.suspend();else ctx.resume();
+  });
+
+  window.SFX={play,startMusic,stopMusic,
+    begin(){init();play("start");setTimeout(startMusic,500)}, // dipanggil bila murid tekan "Mula"
+    result(k){play("check");play(k)},                       // k = "correct" | "partial" | "wrong"
+    nextQ(){play("next");setTimeout(()=>play("question"),260)},
+    hint(){play("hint")},
+    end(){play("finish");stopMusic(2.5)}};
+})();
+</script>
+<!-- ===== /BUNYI-KIT ===== -->
+
+<script>
+/* ---------- STIMULUS ---------- */
+const S = {
+  poster: `<div class="poster"><div class="tag">Kid's Plaza</div>
+    <h3>Children Fashion Show<br>(1-12 years old)</h3>
+    <p>Take your cupboard to the next level with the newest fashion!</p>
+    <div class="row"><span>10 – 12 April</span><span>2-3 p.m.</span></div>
+    <div class="emo">👦👧🧒👧👦</div></div>`,
+  chart: (() => {
+    const m = [["JAN",14],["FEB",16],["MAR",18],["APR",20],["MAY",16],["JUN",10],["JUL",5],["AUG",14],["SEP",16],["OCT",18],["NOV",17],["DEC",14]];
+    return `<div style="text-align:center;font-weight:800;font-size:24px">🌧️ RAINY DAYS</div>
+      <div class="chart">${m.map(x=>`<div class="c"><span class="v">${x[1]}</span><div class="b" style="height:${x[1]*4.5}%"></div></div>`).join("")}</div>
+      <div class="chart-x">${m.map(x=>`<span>${x[0]}</span>`).join("")}</div>
+      <div class="cap">Number of rainy days by month in Pulau Pinang.</div>`;
+  })(),
+  email: `<div class="mail"><div class="h">To: sam@mail.com</div><div class="h">Subject: A Trip to the Zoo</div>
+    <div class="b">Hi Sam,<br><br>Bella, Jimmy and I are going to the zoo this Sunday. The van will leave from school at 10 in the morning. Would you like to join us? If you agree, meet Jimmy and I at my house at 9.00 a.m.<br><br>Matt.</div></div>`,
+  note: `<div class="note">Nadia,<br><br>I'm going out to get some things. I will be back at 4.30 p.m. You can go out to play at 3.30 p.m. but please be back at 5.30 p.m.<br><br>Mum</div>`,
+  chat: `<div class="chat">
+    <div class="msg l"><b>Hana</b>Khairul, would you like to play tennis this evening?</div>
+    <div class="msg r"><b>Khairul</b>Sorry, I can't. I have homework.</div>
+    <div class="msg l"><b>Hana</b>Can't you do it after lunch?</div>
+    <div class="msg r"><b>Khairul</b>No, I have to clean the house with my mother.</div>
+    <div class="msg l"><b>Hana</b>That's too bad. Next time, then.</div></div>`,
+  adam: n => {
+    const t = `<b>Adam's Daily Activities</b><br>Adam is my friend. He lives in a modern house with his family. Every day, he wakes up at 6.30 a.m. Then, he goes to the {6} to brush his teeth and takes a shower. After getting dressed, he has breakfast with his family. At seven, his father sends him to school.<br><br>His class starts at 7.45 a.m. At half past one, he goes home. He has {7} and takes some rest. Then, he does {8} homework. Adam plays with his friends after doing his work. At dinner, he helps his mother to set the table and they eat together.<br><br>After eating, they {9} in the hall to watch TV. Before going to bed, he brushes his teeth and then goes to sleep.`;
+    return t.replace(/\{(\d)\}/g, (_, d) => `<span class="blank ${+d===n?"now":""}">( ${d} )</span>`);
+  },
+  mindy: `<b>Moving to a New Town</b><br>Hi, I am Mindy! I just start staying in a new town which is far away from my old house. My new school is next to a police station but far from my father's office.<br><br>The first month in my new town was a bit strange. I had got many friends in my old school but I did not have anyone to play here. Then, something awesome happened! A girl who I saw a few times before at the playground actually is my neighbour. She also goes to the same school as me but she is in different class. Now, we are best friends, and we walk home together every single day.<br><br>Back in my old place, we did everything at the park. However, things are different here. Each fun thing has its own special place. You can play basketball at the court, cycle at the park or you can have some quiet time at the library.<br><br>I had a hard time finding my way at first since this place is pretty big. So last week, my best friend drew a map. Now I can move around a lot easier. I cannot wait to see what other things I can do with my new friends!`,
+  stories: {
+    A: `<b>A – Be Good To All</b> 🐯<br>Peter the Tiger lived in a forest in Malaysia. He did not like to talk to other animals because he thought he was stronger than them. One day, a man came. A group of monkeys tried to tell Peter but he covered his ears. He did not want to take their advice. The man saw him and caught him in a net. Peter cried for help but no one wanted to help him. The man brought him to the city and sold him to a zoo. Now, he was not strong anymore.`,
+    B: `<b>B – We Are A Family</b> 🐶<br>Anna was born in Malaysia but moved to Singapore last year. One day, she was in the kitchen when she saw a dog outside her house. She could see that it had a broken leg. She went out and carried it into the kitchen. Anna looked after the dog and called it, Snowy. At first, Snowy did not want to be hugged. As they spent more time together, Snowy started to get closer to her. They finally became good friends.`,
+    C: `<b>C – Thank You</b> 🚲<br>Jamil lived in a small house with his family in Johor. He had a test coming soon, but there was no place to study in the house. He had to do it under a tree. It was not very comfortable. His family saw him reading in the hot sun and knew they had to do something. They collected some money and bought him a bike. Now he could ride to the library and study there. Jamil thanked them for being so kind.`
+  }
+};
+
+/* ---------- PARTS ---------- */
+const PARTS = {
+  1:{name:"Part 1", emoji:"📰", instr:"Read the text. Choose A, B or C."},
+  2:{name:"Part 2", emoji:"✏️", instr:"Read the story. Choose the correct word for the blank."},
+  3:{name:"Part 3", emoji:"📖", instr:"Read the story. Answer the questions."},
+  4:{name:"Part 4", emoji:"📚", instr:"Read stories A, B and C. Which story fits?"},
+  5:{name:"Part 5", emoji:"🐾", instr:"Spell the animal word. The first letter is there!"}
+};
+const STORY_OPTS = [["A","Be Good To All"],["B","We Are A Family"],["C","Thank You"]];
+
+/* ---------- QUESTIONS (25 x 4% = 100%) ---------- */
+const Q = [
+  {p:1, st:"poster", q:"The clothes are for children", o:["in Year 1 to Year 6.","who go to new schools.","to keep in their cupboard."], a:0,
+   h:"Look at the age: 1–12 years old. Which school years fit? 🤔"},
+  {p:1, st:"chart", q:"When did it rain the least?", o:["July","April","March"], a:0,
+   h:"Find the SHORTEST bar! 📉"},
+  {p:1, st:"email", q:"If Sam wants to join the trip, he should go to", o:["Matt's place.","Bella's home.","Jimmy's house."], a:0,
+   h:"\"Meet us at MY house.\" Who wrote the email? ✉️"},
+  {p:1, st:"note", q:"Nadia should be home at", o:["half past three.","half past four.","half past five."], a:2,
+   h:"Mum says \"please be back at…\" Find that time! ⏰"},
+  {p:1, st:"chat", q:"In the afternoon, Khairul will", o:["play tennis.","do homework.","clean the house."], a:2,
+   h:"Afternoon = after lunch. What must Khairul do then? 🧹"},
+
+  {p:2, st:"adam6", q:"Blank ( 6 )", o:["kitchen","bedroom","bathroom"], a:2,
+   h:"Where do you brush your teeth and take a shower? 🚿"},
+  {p:2, st:"adam7", q:"Blank ( 7 )", o:["lunch","dinner","breakfast"], a:0,
+   h:"He goes home at half past one. Which meal is at 1.30? 🍛"},
+  {p:2, st:"adam8", q:"Blank ( 8 )", o:["him","his","her"], a:1,
+   h:"Adam is a boy. Whose homework is it? 📒"},
+  {p:2, st:"adam9", q:"Blank ( 9 )", o:["sit","sat","sits"], a:0,
+   h:"Look at \"they eat together\". \"They\" means many people! 👨‍👩‍👦"},
+
+  {p:3, st:"mindy", q:"Where is Mindy's new school?", o:["near her old house","near the police station","near her father's office"], a:1,
+   h:"Read the first part: \"My new school is next to…\" 🏫"},
+  {p:3, st:"mindy", q:"Who has become Mindy's new best friend?", o:["someone from her old school","someone she just met at the playground","someone who is not in the same class as her"], a:2,
+   h:"Read again: \"…but she is in different class.\" 👭"},
+  {p:3, st:"mindy", q:"What does Mindy say about her new town?", o:["There are a lot of fun activities.","It is the same as her old town.","Everything is at one place."], a:0,
+   h:"Basketball, cycling, library… What does that tell you? 🏀🚴📚"},
+  {p:3, st:"mindy", q:"Why Mindy could not find her way around?", o:["The town was very large.","She could not read the map.","Her best friend did not help her."], a:0,
+   h:"Find the word \"since\" in the last part. 🗺️"},
+  {p:3, st:"mindy", q:"From the text, we know that Mindy", o:["does not like her new town.","wants to try new things.","is alone and sad."], a:1,
+   h:"Read the very last sentence. How does Mindy feel? 😊"},
+
+  {p:4, st:"stories", q:"It is about a kind person.", o:STORY_OPTS, a:1,
+   h:"Who helps an animal with a broken leg? 🩹"},
+  {p:4, st:"stories", q:"Someone does not listen to his friends.", o:STORY_OPTS, a:0,
+   h:"Who covers his ears? 🙉"},
+  {p:4, st:"stories", q:"The story takes place in another country.", o:STORY_OPTS, a:1,
+   h:"We live in Malaysia. Which story is in a different country? 🌏"},
+  {p:4, st:"stories", q:"This person gets some help from others.", o:STORY_OPTS, a:2,
+   h:"Who gets a present from his family? 🎁"},
+  {p:4, st:"stories", q:"The last part of the story is sad.", o:STORY_OPTS, a:0,
+   h:"Read the ending of each story. Who ends up in a zoo? 😢"},
+  {p:4, st:"stories", q:"This story is about love for family.", o:STORY_OPTS, a:2,
+   h:"Which family works together to help someone? ❤️"},
+
+  {p:5, q:"It can climb fast and loves bananas.", w:"monkey", h:"It swings from tree to tree! 🌳🍌"},
+  {p:5, q:"This animal lived on Earth a long time ago.", w:"dinosaur", h:"Think of a T-rex! 🦖"},
+  {p:5, q:"It is the king of the animals.", w:"lion", h:"It has a big mane and goes ROAR! 👑"},
+  {p:5, q:"This heavy animal has two big ears and a long nose.", w:"elephant", h:"Its long nose is called a trunk! 🐘"},
+  {p:5, q:"A cute animal that loves cheese.", w:"mouse", h:"It is small and says \"squeak!\" 🧀"}
+];
+const PTS = 100 / Q.length; // 4 marks each
+
+/* ---------- STATE ---------- */
+let idx = 0, score = 0, sel = null, done = false, hintUsed = false, tab = "A";
+const res = [];
+const app = document.getElementById("app");
+
+/* ---------- SOUND ---------- */
+let ac;
+function tone(freqs){
+  try{
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(.15, ac.currentTime + i*.12);
+      g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + i*.12 + .25);
+      o.connect(g); g.connect(ac.destination);
+      o.start(ac.currentTime + i*.12); o.stop(ac.currentTime + i*.12 + .3);
+    });
+  }catch(e){}
+}
+
+/* ---------- ANIMATIONS ---------- */
+function confetti(){
+  const c = ["#ff5d5d","#ffd93d","#2ec27e","#4d96ff","#9b5de5","#ff9f1c"];
+  for(let i=0;i<40;i++){
+    const d = document.createElement("div");
+    d.className = "confetti";
+    d.style.left = Math.random()*100 + "vw";
+    d.style.background = c[i % c.length];
+    d.style.animationDelay = Math.random()*.4 + "s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(), 2400);
+  }
+}
+function floaty(e){
+  const d = document.createElement("div");
+  d.className = "floaty"; d.textContent = e;
+  d.style.left = "50%"; d.style.top = "45%"; d.style.marginLeft = "-30px";
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(), 1300);
+}
+
+/* ---------- SCREENS ---------- */
+function start(){
+  app.innerHTML = `<div class="card center">
+    <div class="big-emoji">🦁📚</div>
+    <h1>English Fun Practice!</h1>
+    <div style="font-size:24px">Year 4 • Bahasa Inggeris</div>
+    <div class="pill-row">
+      <span class="pill">📝 25 questions</span>
+      <span class="pill">⭐ 4 marks each</span>
+      <span class="pill">💡 1 hint each</span>
+    </div>
+    <div style="font-size:22px;margin-bottom:18px">Read 👀 → Try ✋ → Hint 💡 → Check ✅ → Go! 🚀</div>
+    <button class="btn go" onclick="SFX.begin();render()">Let's Start! 🚀</button>
+  </div>`;
+}
+
+function stimHTML(q){
+  if(!q.st) return "";
+  if(q.st.startsWith("adam")) return `<div class="stim">${S.adam(+q.st.slice(4))}</div>`;
+  if(q.st === "stories"){
+    return `<div class="stim"><div class="tabs">${["A","B","C"].map(k=>`<button class="tab ${k===tab?"on":""}" onclick="setTab('${k}')">Story ${k}</button>`).join("")}</div><div id="storyBody">${S.stories[tab]}</div></div>`;
+  }
+  return `<div class="stim">${S[q.st]}</div>`;
+}
+function setTab(k){
+  tab = k;
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on", b.textContent.endsWith(k)));
+  document.getElementById("storyBody").innerHTML = S.stories[k];
+}
+
+function render(){
+  const q = Q[idx], P = PARTS[q.p];
+  sel = null; done = false; hintUsed = false;
+  if(q.p === 4 && (idx === 0 || Q[idx-1].p !== 4)) tab = "A";
+
+  let body;
+  if(q.w){
+    const boxes = q.w.split("").map((ch,i)=> i===0
+      ? `<input class="lb fixed" value="${ch}" disabled>`
+      : `<input class="lb" maxlength="1" data-i="${i}" autocomplete="off" autocapitalize="off" spellcheck="false">`).join("");
+    body = `<div class="question">🐾 ${q.q}</div><div class="spell" id="spell">${boxes}</div>`;
+  } else {
+    body = `<div class="question">${q.q}</div><div class="opts">${q.o.map((t,i)=>{
+      const L = Array.isArray(t) ? t[0] : "ABC"[i];
+      const txt = Array.isArray(t) ? t[1] : t;
+      return `<button class="opt" data-i="${i}" onclick="pick(${i})"><span class="L">${L}</span><span>${txt}</span></button>`;
+    }).join("")}</div>`;
+  }
+
+  app.innerHTML = `
+    <div class="top">
+      <span class="qnum">Q${idx+1}/${Q.length}</span>
+      <div class="bar"><i style="width:${idx/Q.length*100}%"></i></div>
+      <span class="score">⭐ ${Math.round(score)}%</span>
+    </div>
+    <div class="card" id="card">
+      <span class="part-tag">${P.emoji} ${P.name}</span>
+      <div class="instr">${P.instr}</div>
+      ${stimHTML(q)}
+      ${body}
+      <div id="hintArea"></div>
+      <div id="fb"></div>
+      <div class="actions" id="acts">
+        <button class="btn hint" id="hintBtn" onclick="showHint()">💡 Hint</button>
+        <button class="btn go" id="checkBtn" onclick="check()" disabled>✅ Check</button>
+      </div>
+    </div>`;
+
+  if(q.w) setupSpell();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function setupSpell(){
+  const ins = [...document.querySelectorAll("#spell .lb:not(.fixed)")];
+  ins.forEach((el,k)=>{
+    el.addEventListener("input", ()=>{
+      el.value = el.value.replace(/[^a-zA-Z]/g,"").toLowerCase().slice(-1);
+      if(el.value && ins[k+1]) ins[k+1].focus();
+      document.getElementById("checkBtn").disabled = !ins.every(x=>x.value);
+    });
+    el.addEventListener("keydown", e=>{
+      if(e.key === "Backspace" && !el.value && ins[k-1]){ ins[k-1].focus(); }
+      if(e.key === "Enter" && ins.every(x=>x.value)) check();
+    });
+  });
+  ins[0].focus();
+}
+
+function pick(i){
+  if(done) return;
+  sel = i;
+  document.querySelectorAll(".opt").forEach(b=>b.classList.toggle("sel", +b.dataset.i === i));
+  document.getElementById("checkBtn").disabled = false;
+}
+
+function showHint(){
+  if(hintUsed || done) return;
+  hintUsed = true;
+  document.getElementById("hintArea").innerHTML = `<div class="hintbox">💡 ${Q[idx].h}</div>`;
+  const b = document.getElementById("hintBtn");
+  b.disabled = true; b.textContent = "💡 Hint used"; SFX.hint();
+}
+
+function check(){
+  if(done) return;
+  const q = Q[idx];
+  let ok;
+  if(q.w){
+    const ins = [...document.querySelectorAll("#spell .lb:not(.fixed)")];
+    if(!ins.every(x=>x.value)) return;
+    const word = q.w[0] + ins.map(x=>x.value).join("");
+    ok = word.toLowerCase() === q.w;
+    ins.forEach(x=>x.disabled = true);
+    document.getElementById("spell").classList.add(ok ? "ok" : "bad");
+  } else {
+    if(sel === null) return;
+    ok = sel === q.a;
+    document.querySelectorAll(".opt").forEach(b=>{
+      b.disabled = true;
+      if(+b.dataset.i === sel) b.classList.add(ok ? "ok" : "bad");
+    });
+  }
+  done = true;
+  res.push({p:q.p, ok});
+  if(ok) score += PTS;
+
+  const fb = document.getElementById("fb");
+  if(ok){
+    const m = ["Great job! 🎉","Awesome! 🌟","You got it! 💪","Super star! ⭐","Well done! 🥳"];
+    fb.innerHTML = `<div class="fb ok">${m[Math.floor(Math.random()*m.length)]}</div>`;
+    confetti(); floaty("⭐"); SFX.result("correct");
+  } else {
+    const m = ["Oops! Keep going! 💪","Nice try! Next one! 🚀","Don't give up! 🌈"];
+    fb.innerHTML = `<div class="fb bad">${m[Math.floor(Math.random()*m.length)]}</div>`;
+    const c = document.getElementById("card");
+    c.classList.add("wrong-flash"); floaty("💨"); SFX.result("wrong");
+  }
+  document.querySelector(".score").textContent = `⭐ ${Math.round(score)}%`;
+  document.getElementById("acts").innerHTML = idx < Q.length-1
+    ? `<button class="btn next" onclick="next()">Next ➡️</button>`
+    : `<button class="btn next" onclick="next()">See My Score 🏆</button>`;
+}
+
+function next(){
+  idx++;
+  if(idx < Q.length){ render(); SFX.nextQ(); } else finish();
+}
+
+function finish(){
+  const s = Math.round(score);
+  const n = s >= 80 ? 3 : s >= 50 ? 2 : 1;
+  const msg = s >= 80 ? "Amazing! You are an English star! 🌟" : s >= 50 ? "Good work! Keep practising! 💪" : "Nice try! Practice makes perfect! 🌈";
+  const parts = [1,2,3,4,5].map(p=>{
+    const r = res.filter(x=>x.p===p);
+    return `<div><span>${PARTS[p].emoji} ${PARTS[p].name}</span><span>${r.filter(x=>x.ok).length} / ${r.length}</span></div>`;
+  }).join("");
+  app.innerHTML = `<div class="card">
+    <h1>🏆 All Done!</h1>
+    <div class="stars">${[0,1,2].map(i=>`<span style="animation-delay:${i*.25}s;${i<n?"":"filter:grayscale(1);opacity:.35"}">⭐</span>`).join("")}</div>
+    <div class="final">${s}%</div>
+    <div class="center" style="font-size:26px;font-weight:800">${msg}</div>
+    <div class="partsum">${parts}</div>
+    <div class="dots">${res.map((r,i)=>`<div class="dot ${r.ok?"y":"n"}">${i+1}</div>`).join("")}</div>
+  </div>`;
+  if(s >= 50) confetti();
+  SFX.end();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+start();
+</script>
+</body>
+</html>
