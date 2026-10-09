@@ -247,6 +247,13 @@ button{font-family:inherit}
   .chip{font-size:19px}
 }
 
+/* ---- rajah dari kertas soalan (WebP) ---- */
+img.rajah{display:block;max-width:100%;height:auto;max-height:360px;width:auto;margin:6px auto;background:#fff;border:3px solid var(--ink);border-radius:16px;padding:6px}
+img.rajah.big{max-height:460px}
+.stim img.rajah{margin:10px auto 2px}
+.stim:has(img.rajah){max-height:none;overflow:visible}
+.rajah-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center}
+@media (max-width:620px){img.rajah{max-height:260px}img.rajah.big{max-height:340px}}
 </style>
 </head>
 <body>
@@ -262,7 +269,7 @@ button{font-family:inherit}
     <div class="rules">Ada <b>32 soalan</b>. Markah penuh <b>100</b>.<br>
       Setiap soalan ada <b>1 petunjuk</b> 💡 sahaja.<br>
       Tekan <b>Semak</b> sekali sahaja, kemudian terus ke soalan seterusnya.</div>
-    <button class="semak" onclick="startQuiz()">Jom Mula! 🚀</button>
+    <button class="semak" onclick="REKOD.mula(startQuiz)">Jom Mula! 🚀</button>
   </div>
 
   <!-- KUIZ -->
@@ -457,12 +464,127 @@ button{font-family:inherit}
 </script>
 <!-- ===== /BUNYI-KIT ===== -->
 
+<!-- ===== REKOD-KIT: nama murid + rekod markah + hantar ke Google Sheet cikgu ===== -->
+<style>
+.rk-back{position:fixed;inset:0;z-index:10000;background:rgba(15,23,60,.72);display:flex;align-items:center;justify-content:center;padding:16px;animation:rkFade .25s both}
+.rk-box{background:#fffbea;border:5px solid #111;border-radius:30px;box-shadow:0 12px 0 #111;padding:22px 26px 26px;width:100%;max-width:560px;text-align:center;font-family:inherit;animation:rkPop .45s both}
+.rk-box .rk-emo{font-size:76px;line-height:1;display:inline-block;animation:rkFloat 2.4s ease-in-out infinite}
+.rk-box h2{font-size:38px;margin:6px 0 14px;line-height:1.15}
+.rk-box input{width:100%;font:inherit;font-size:32px;font-weight:600;text-align:center;padding:12px 14px;border:4px solid #111;border-radius:20px;background:#fff;outline:none}
+.rk-box input:focus{box-shadow:0 0 0 5px #ffd23f}
+.rk-box .rk-go{margin-top:18px;width:100%;font:inherit;font-size:40px;font-weight:700;color:#fff;background:#22c55e;border:4px solid #111;border-radius:22px;padding:6px 14px 10px;box-shadow:0 6px 0 #118a3e;cursor:pointer}
+.rk-box .rk-go:disabled{opacity:.45;cursor:not-allowed}
+.rk-box .rk-go:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #118a3e}
+.rk-box.rk-shake{animation:rkShake .45s}
+.rk-status{margin:16px auto 0;max-width:560px;background:#fffbea;border:4px solid #111;border-radius:20px;padding:8px 16px;font-size:22px;font-weight:600;text-align:center}
+@keyframes rkFade{from{opacity:0}}
+@keyframes rkPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes rkFloat{50%{transform:translateY(-8px)}}
+@keyframes rkShake{20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+@media (max-width:620px){.rk-box h2{font-size:30px}.rk-box input{font-size:26px}.rk-box .rk-go{font-size:32px}.rk-box .rk-emo{font-size:60px}}
+</style>
+<script>
+(function(){
+  /* ============ TETAPAN CIKGU ============
+     Tampal URL Web App Apps Script di bawah (berakhir dengan /exec).
+     Kalau kosong, latihan tetap jalan tapi markah tidak dihantar. */
+  const REKOD_URL = "TAMPAL_URL_APPS_SCRIPT_DI_SINI";
+  /* ======================================= */
+
+  const SUBJEK = "Sains";
+  const BAHASA = "ms"; // "ms" atau "en"
+  const T = BAHASA==="en"
+    ? {tanya:"What is your name?",ph:"Type your full name",go:"Let's go! 🚀",ok:"📨 Your score has been sent to your teacher!",q:"📶 No internet. Your score will be sent next time.",hi:"Well done"}
+    : {tanya:"Siapa nama kamu?",ph:"Tulis nama penuh",go:"Jom Mula! 🚀",ok:"📨 Markah kamu sudah dihantar kepada cikgu!",q:"📶 Tiada internet. Markah akan dihantar kemudian.",hi:"Tahniah"};
+  const QKEY="rekod_baris_tertunda";
+  let nama="", butiran=[], mulaMasa=null, dihantar=false;
+  const adaURL=()=>/^https:\/\/script\.google(usercontent)?\.com\//.test(REKOD_URL);
+
+  function bersih(s){return String(s||"").replace(/[<>]/g,"").replace(/\s+/g," ").trim().slice(0,60)
+    .toLowerCase().replace(/(^|\s|-)(\S)/g,(m,a,b)=>a+b.toUpperCase())
+    .replace(/(^|\s)(Bin|Binti|Bt|A\/l|A\/p)(?=\s|$)/g,(m,a,b)=>a+b.toLowerCase())}
+
+  /* --- skrin nama --- */
+  function mula(fn){
+    const back=document.createElement("div");back.className="rk-back";
+    back.innerHTML=`<form class="rk-box" autocomplete="off"><span class="rk-emo">🧒</span><h2>${T.tanya}</h2>
+      <input id="rkNama" maxlength="60" placeholder="${T.ph}" aria-label="${T.tanya}">
+      <button class="rk-go" type="submit" disabled>${T.go}</button></form>`;
+    document.body.appendChild(back);
+    const f=back.querySelector("form"),inp=back.querySelector("input"),b=back.querySelector("button");
+    inp.addEventListener("input",()=>{b.disabled=bersih(inp.value).length<2});
+    f.addEventListener("submit",e=>{e.preventDefault();
+      const n=bersih(inp.value);
+      if(n.length<2){f.classList.remove("rk-shake");void f.offsetWidth;f.classList.add("rk-shake");return}
+      nama=n;butiran=[];dihantar=false;mulaMasa=new Date();back.remove();fn&&fn();});
+    setTimeout(()=>inp.focus(),80);
+  }
+
+  /* --- kenal pasti jenis kesilapan ---
+     frac   : bahagian markah yang diperoleh (0–1)
+     j      : jenis lalai soalan ("kecuaian" | "konsep" | "fakta")
+     t      : jenis khas ikut pilihan salah, cth {2:"kecuaian"}
+     pilih  : indeks pilihan murid (soalan aneka pilihan)
+     hampir : true kalau jawapan hampir tepat (cth 1 huruf / 1 digit salah)
+     Peraturan: separuh markah atau lebih / hampir tepat → kecuaian. */
+  function jenis(o){
+    if(o.frac>=1) return "";
+    if(o.frac>=0.5||o.hampir) return "kecuaian";
+    if(o.t&&o.pilih!=null&&o.t[o.pilih]) return o.t[o.pilih];
+    return o.j||"konsep";
+  }
+
+  function catat(no,got,max,jenisSalah){
+    butiran.push({no:String(no),g:Math.round(got*100)/100,m:max,j:jenisSalah||""});
+  }
+
+  /* --- hantar --- */
+  function hantarSatu(baris){
+    return fetch(REKOD_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(baris)});
+  }
+  function tertunda(){try{return JSON.parse(localStorage.getItem(QKEY)||"[]")}catch(e){return[]}}
+  function simpanTertunda(a){try{localStorage.setItem(QKEY,JSON.stringify(a.slice(-50)))}catch(e){}}
+  async function hantarTertunda(){
+    if(!adaURL()||!navigator.onLine)return;
+    const a=tertunda();if(!a.length)return;
+    const baki=[];
+    for(const r of a){try{await hantarSatu(r)}catch(e){baki.push(r)}}
+    simpanTertunda(baki);
+  }
+
+  /* dipanggil di skrin keputusan: pulangkan elemen status untuk dipaparkan */
+  function selesai(markah){
+    const el=document.createElement("div");el.className="rk-status";
+    if(!nama){el.remove();return el}
+    el.textContent=`${T.hi}, ${nama}! 🎉`;
+    if(dihantar||!adaURL())return el;
+    dihantar=true;
+    const baris={versi:1,nama,subjek:SUBJEK,markah:Math.round(markah),
+      mula:mulaMasa?mulaMasa.toISOString():"",tamat:new Date().toISOString(),butiran};
+    const papar=t=>{el.innerHTML=`${T.hi}, ${nama}! 🎉<br>${t}`};
+    if(!navigator.onLine){simpanTertunda([...tertunda(),baris]);papar(T.q);return el}
+    hantarSatu(baris).then(()=>papar(T.ok)).catch(()=>{simpanTertunda([...tertunda(),baris]);papar(T.q)});
+    return el;
+  }
+
+  window.addEventListener("online",hantarTertunda);
+  window.addEventListener("load",()=>setTimeout(hantarTertunda,1500));
+  window.REKOD={mula,jenis,catat,selesai,get nama(){return nama}};
+})();
+</script>
+<!-- ===== /REKOD-KIT ===== -->
+
+
 <script>
 /* ===== TETAPAN GURU ===== */
 const TUNJUK_JAWAPAN = true; // true = tunjuk jawapan betul bila murid salah. false = sembunyi.
 
 /* ===== VISUAL ===== */
+/* Folder gambar rajah (relatif kepada fail HTML ini) */
+const IMG_DIR = "img/sains-t4/";
+const IMG_SIZE = {"a10-lori":[927,431],"a4-pokok":[287,405],"a6-ambulans":[578,379],"a7-objek":[924,257],"a8-bunga":[784,268],"a8-carta":[818,515],"a9-bola":[597,453],"b2-haiwan":[962,356],"b2-katak":[277,368],"b4-kuali":[691,597],"c1-ketuhar":[1000,742],"c1-mentol":[689,580],"c2-litar":[1000,853],"c4-carta":[1000,497],"c4-dram":[975,565],"c4-gelas":[956,389],"c4-muzik":[787,436]};
 const V = {
+  img:(n,alt,cls="")=>{const z=IMG_SIZE[n]||[];return `<img class="rajah ${cls}" src="${IMG_DIR}${n}.webp" alt="${alt}" width="${z[0]||""}" height="${z[1]||""}" loading="lazy" decoding="async">`},
   tree:(top,kids)=>`<div class="tree"><div class="node">${top}</div><div class="stem">⬇</div><div class="kids">${kids.map(k=>`<div class="node">${k[0]}<span class="tag">${k[1]}</span></div>`).join("")}</div></div>`,
   pics:(arr)=>`<div class="pics">${arr.map(p=>`<div class="pic ${p[3]||""}"><span class="e ${p[4]||""}">${p[0]}</span><b>${p[1]}</b>${p[2]?`<small>${p[2]}</small>`:""}</div>`).join("")}</div>`,
   table:(head,rows)=>`<table class="tbl"><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table>`,
@@ -488,14 +610,14 @@ const V = {
   }
 };
 const CTX = {
-  oven:`🧑‍🔬 Abu uji <b>ketuhar suria</b>. Setiap kotak dibalut <b>kertas hitam</b> dan ada sebiji <b>telur</b> 🍳.<br>`+
-       `<div style="margin-top:8px">${V.pics([["☀️","P","Kerajang aluminium"],["☀️","Q","Plastik lutsinar"],["☀️","R","Kertas minyak"]])}</div>`,
+  oven:`<p>🧑‍🔬 Abu uji <b>ketuhar suria</b>. Setiap kotak dibalut <b>kertas hitam</b> dan ada sebiji <b>telur</b> 🍳.</p>`+
+       V.img("c1-ketuhar","Ketuhar suria P, Q dan R","big"),
   ovenRes:`<b>Masa telur masak:</b><div style="margin-top:8px;display:flex;justify-content:center">${V.table(["Bahan","Masa"],[["Kerajang aluminium","2 jam"],["Kertas minyak","5 jam"],["Plastik lutsinar","6 jam"]])}</div>`,
-  circuit:`⚡ Murid 4 Kenanga uji bahan dalam <b>4 litar</b>.<div style="margin-top:8px">${V.pics([["💡","Litar W","Kain","dark"],["💡","Litar X","Pin","","glow"],["💡","Litar Y","Kunci","","glow"],["💡","Litar Z","Pemadam","dark"]])}</div>`,
-  tyre:`🛞 Adam letak <b>tayar kereta lama</b> di atas <b>rumput</b> 🌱 tepi rumahnya. Seminggu kemudian, rumput di bawah tayar <b>berubah</b>.`,
+  circuit:`<p>⚡ Murid 4 Kenanga uji bahan dalam <b>4 litar</b>.</p>${V.img("c2-litar","Litar W, X, Y dan Z","big")}`,
+  tyre:`<p>🛞 Adam letak <b>tayar kereta lama</b> di atas <b>rumput</b> 🌱 tepi rumahnya. Seminggu kemudian, rumput di bawah tayar <b>berubah</b>.</p>`,
   garden:`<div style="display:flex;justify-content:center">${V.table(["","Kebun Adam","Kebun Siti"],[["💧 Air","50 liter","30 liter"],["🧪 Baja / pasu","30 g","10 g"],["💡 Lampu waktu malam","Ada","Tiada"],["🥬 Hasil sayuran","<b>30 kg</b>","<b>15 kg</b>"]])}</div>`,
-  music:`🎵 Uzair dan Uwais bermain alat muzik.<div style="margin-top:8px">${V.pics([["🎻","P","Biola"],["🥁","Q","Drum"]])}</div>`,
-  glass:`🥄 Uzair ketuk gelas dengan sudu. Aras air setiap gelas berbeza.<div style="margin-top:8px;display:flex;justify-content:center">${V.glasses()}</div>`
+  music:`🎵 Uzair dan Uwais bermain alat muzik.${V.img("c4-muzik","P biola, Q drum")}`,
+  glass:`🥄 Uzair ketuk gelas dengan sudu. Aras air setiap gelas berbeza.${V.img("c4-gelas","Gelas A, B, C, D dan sudu")}`
 };
 
 /* ===== SOALAN ===== */
@@ -521,7 +643,7 @@ const Q = [
   why:"Katak (kulit lembap), berudu (insang), rama-rama (spirakel)."},
  {sec:"A",m:2,type:"mcq",
   q:"Pokok hiasan Adam tumbuh condong ke arah tingkap. Apa tindakan terbaik supaya pokok tumbuh tegak semula?",
-  vis:V.pics([["🪟","Tingkap"],["🪴","Pokok condong ➡ tingkap"]]),
+  vis:V.img("a4-pokok","Pokok hiasan condong ke arah tingkap"),
   opts:["Pindahkan pokok ke luar rumah yang dapat cahaya matahari","Pindahkan pokok ke bilik yang lapang dan luas","Ikat pokok pada kayu lurus dalam pasu","Ganti sebahagian pokok dengan pokok baharu"],ans:0,
   hint:"Pokok condong sebab cari sesuatu dari tingkap ☀️.",
   why:"Pokok tumbuh ke arah cahaya. Di luar, cahaya datang dari atas."},
@@ -533,31 +655,31 @@ const Q = [
   why:"A paling dekat → bayang paling besar. C paling jauh → paling kecil."},
  {sec:"A",m:2,type:"mcq",
   q:"Razif dan Azlan dengar bunyi kenderaan ini. Apa kesan bunyinya?",
-  vis:V.pics([["🚑","Ambulans","🚨 siren"]]),
+  vis:V.img("a6-ambulans","Ambulans"),
   opts:["Sukar berkomunikasi","Mengganggu ketenangan","Menyebabkan tekanan emosi","Memberikan isyarat kecemasan"],ans:3,
   hint:"Kenapa ambulans bunyikan siren? 🚨",
   why:"Siren ambulans memberi isyarat kecemasan."},
  {sec:"A",m:2,type:"mcq",
   q:"Pernyataan mana betul tentang sumber asas bahan objek ini?",
-  vis:V.pics([["🛞","P","Tayar"],["🪑","Q","Bangku kayu"],["🛏️","R","Selimut"],["⛺","S","Khemah"]]),
+  vis:V.img("a7-objek","P tayar, Q bangku kayu, R selimut, S khemah"),
   opts:["P daripada sumber asas haiwan","Sumber asas Q dan R ialah tumbuhan","R dan S daripada petroleum","Q dan S daripada sumber asas yang sama"],ans:1,
   hint:"Kayu 🪵 datang dari mana?",
   why:"Kayu dan kapas datang daripada tumbuhan."},
  {sec:"A",m:2,type:"mcq",
   q:"Bunga diletak di belakang P, Q dan R. Padanan sifat bahan mana betul?",
-  vis:`<div style="display:flex;flex-direction:column;align-items:center;gap:10px">${V.pics([["🌷","P","Nampak kabur"],["⬜","Q","Tak nampak"],["🌷","R","Nampak jelas"]])}${V.bars(["P","Q","R"],[2,0,5],5,"Cahaya tembus","Objek")}</div>`,
+  vis:`<div class="rajah-row">${V.img("a8-bunga","Bunga di belakang objek P, Q dan R")}${V.img("a8-carta","Carta kebolehan cahaya menembusi bahan")}</div>`,
   opts:[["Lutsinar","Lut cahaya","Legap"],["Lutsinar","Legap","Lut cahaya"],["Lut cahaya","Lutsinar","Legap"],["Lut cahaya","Legap","Lutsinar"]],cols:["P","Q","R"],ans:3,
   hint:"Cahaya tak tembus langsung = legap. Tembus semua = lutsinar.",
   why:"P sedikit cahaya (lut cahaya), Q tiada (legap), R banyak (lutsinar)."},
  {sec:"A",m:2,type:"mcq",
   q:"Ke mana arah bola selepas dilepaskan?",
-  vis:V.pics([["🏀⬆️","Situasi 1","Lontar bola ke atas"],["⛹️","Situasi 2","Lantun bola ke lantai"]]),
+  vis:V.img("a9-bola","Situasi 1 dan Situasi 2"),
   opts:[["Ke atas","Ke atas"],["Ke atas","Ke bawah"],["Ke bawah","Ke atas"],["Ke bawah","Ke bawah"]],cols:["Situasi 1","Situasi 2"],ans:2,
   hint:"Bola tinggi akan jatuh 🌍. Bola kena lantai akan melantun.",
   why:"Situasi 1: bola jatuh ke bawah. Situasi 2: bola melantun ke atas."},
  {sec:"A",m:2,type:"mcq",
   q:"Dua orang susah angkat kotak berat ke dalam lori. Alat mana memudahkan kerja?",
-  vis:V.pics([["🛻","Lori"],["📦","Kotak berat"]]),
+  vis:V.img("a10-lori","Dua orang mengangkat kotak berat ke lori"),
   opts:["Tali dan takal","Tangga dan takal","Papan disendengkan dan tali","Papan disendengkan dan troli"],ans:3,
   hint:"Tolak naik cerun 🛝 dengan beroda 🛒 lebih senang.",
   why:"Papan sendeng + troli beroda memudahkan kotak naik ke lori."},
@@ -572,6 +694,7 @@ const Q = [
   why:"Amfibia: peparu + kulit lembap. Mamalia: peparu."},
  {sec:"B",m:4,type:"assign",
   q:"Haiwan mana bernafas sama seperti katak 🐸? Kenapa?",
+  vis:`<div class="rajah-row">${V.img("b2-katak","Katak")}${V.img("b2-haiwan","Ikan, cacing dan salamander")}</div>`,
   chips:null,
   rows:[{l:"Haiwan",chips:["🐟 Ikan","🪱 Cacing","🦎 Salamander"],a:[2]},
         {l:"Sebab",chips:["Bernafas guna spirakel","Bernafas guna peparu dan kulit lembap","Bernafas guna insang"],a:[1]}],
@@ -586,13 +709,7 @@ const Q = [
   why:"Haiwan: sofa kulit, sweater. Petroleum: khemah, payung."},
  {sec:"B",m:4,type:"assign",
   q:"Padankan sifat bahan untuk bahagian X dan Y pada kuali.",
-  vis:`<svg viewBox="0 0 360 150" width="340" style="max-width:100%">
-   <ellipse cx="120" cy="80" rx="100" ry="40" fill="#555"/><ellipse cx="120" cy="74" rx="88" ry="30" fill="#2d2d2d"/>
-   <path d="M20 80 Q120 140 220 80" fill="none" stroke="#c9ced6" stroke-width="10"/>
-   <rect x="215" y="66" width="40" height="10" fill="#c9ced6"/><rect x="250" y="60" width="95" height="22" rx="11" fill="#444"/>
-   <text x="70" y="145" font-size="24" font-weight="800" fill="#6c5ce7">X</text><line x1="88" y1="138" x2="110" y2="112" stroke="#6c5ce7" stroke-width="3"/>
-   <text x="300" y="40" font-size="24" font-weight="800" fill="#e17055">Y</text><line x1="305" y1="45" x2="300" y2="62" stroke="#e17055" stroke-width="3"/>
-   </svg>`,
+  vis:V.img("b4-kuali","Periuk dengan bahagian X dan Y"),
   instr:"X = badan kuali (logam). Y = pemegang.",
   chips:["Serap air","Penebat haba","Penebat elektrik","Mengalirkan haba"],
   rows:[{l:"X (badan kuali)",a:[3]},{l:"Y (pemegang)",a:[1]}],
@@ -617,6 +734,7 @@ const Q = [
   why:"Lebih baik memerangkap haba → telur masak lebih cepat."},
  {sec:"C",m:2,type:"mcq",ctx:"ovenRes",
   q:"Abu tambah mentol 💡 pada ketuhar kerajang aluminium. Ramalkan masa telur masak.",
+  vis:V.img("c1-mentol","Ketuhar suria dengan mentol"),
   opts:["1 jam 30 minit","2 jam","5 jam","6 jam"],ans:0,
   hint:"Mentol tambah haba lagi 🔥. Lebih cepat atau lambat daripada 2 jam?",
   why:"Haba bertambah → telur masak kurang daripada 2 jam."},
@@ -684,7 +802,7 @@ const Q = [
   why:"P: tali biola bergetar. Q: kulit drum bergetar."},
  {sec:"C",m:5,type:"mcq",
   q:"Di kedudukan mana Uwais dengar bunyi drum paling perlahan?",
-  vis:V.bars(["M","N","O"],[5,4,3],5,"Kekuatan bunyi (dB)","Kedudukan Uwais"),
+  vis:V.img("c4-dram","Carta kekuatan bunyi di kedudukan M, N dan O"),
   opts:["M","N","O"],ans:2,grid:true,
   hint:"Palang paling rendah = bunyi paling lemah 📉.",
   why:"Di O, bunyi drum paling lemah."},
@@ -695,12 +813,54 @@ const Q = [
   why:"Air sedikit → gelas lebih mudah bergetar → bunyi lebih kuat."},
  {sec:"C",m:5,type:"order",
   q:"Susun gelas dari bunyi PALING KUAT ke PALING LEMAH.",
-  vis:`<div style="display:flex;flex-direction:column;align-items:center;gap:8px">${V.glasses()}${V.bars(["A","B","C","D"],[5,4,3,1.5],5,"Kekuatan bunyi","Gelas")}</div>`,
+  vis:`<div class="rajah-row">${V.img("c4-gelas","Gelas A, B, C dan D")}${V.img("c4-carta","Carta kekuatan bunyi gelas A, B, C dan D")}</div>`,
   instr:"Tekan gelas ikut turutan.",
   items:["A","B","C","D"],ans:["A","B","C","D"],
   hint:"Getaran makin kurang, bunyi makin lemah 📉.",
   why:"Gelas A bergetar paling banyak. B, C, D makin kurang bergetar."}
 ];
+
+/* ===== TAG KELEMAHAN (untuk rekod cikgu) =====
+   Satu baris = satu soalan, ikut turutan.
+   "kecuaian" | "konsep" | "fakta"  = jenis kelemahan kalau murid salah soalan ini.
+   {indeks:"jenis"} = jenis khas kalau murid pilih pilihan itu (A=0, B=1, C=2, D=3).
+   Automatik: dapat separuh markah atau lebih / hampir tepat = kecuaian. */
+const TAG = [
+  "konsep",                    // 1. A1 gerak balas rangsangan
+  "fakta",                     // 2. A2 vertebrata / invertebrata
+  "fakta",                     // 3. A3 organ pernafasan
+  "konsep",                    // 4. A4 pokok condong
+  "konsep",                    // 5. A5 saiz bayang-bayang
+  "konsep",                    // 6. A6 kesan bunyi ambulans
+  "fakta",                     // 7. A7 sumber asas bahan
+  "konsep",                    // 8. A8 lutsinar / lut cahaya / legap
+  "konsep",                    // 9. A9 arah bola
+  "konsep",                    // 10. A10 alat memudahkan kerja
+  "fakta",                     // 11. B1 organ pernafasan amfibia & mamalia
+  "fakta",                     // 12. B2 haiwan bernafas seperti katak
+  "fakta",                     // 13. B3 sumber asas objek
+  "konsep",                    // 14. B4 sifat bahan kuali
+  "konsep",                    // 15. C1 pemboleh ubah dimalarkan
+  "konsep",                    // 16. C1 pola masa telur masak
+  "konsep",                    // 17. C1 kesimpulan
+  "konsep",                    // 18. C1 ramalan dengan mentol
+  "konsep",                    // 19. C1 bina carta palang
+  "fakta",                     // 20. C2 litar mentol menyala
+  "konsep",                    // 21. C2 inferens litar W & Z
+  "konsep",                    // 22. C2 kelaskan objek
+  "konsep",                    // 23. C2 definisi secara operasi
+  "fakta",                     // 24. C3 keperluan fotosintesis
+  "konsep",                    // 25. C3 rumput bawah tayar
+  "konsep",                    // 26. C3 halang rumput tumbuh
+  "konsep",                    // 27. C3 hasil kebun berbeza
+  "konsep",                    // 28. C3 lampu waktu malam
+  "fakta",                     // 29. C4 bunyi dihasilkan
+  ["fakta",{0:"kecuaian"}],    // 30. C4 bunyi paling perlahan — M = paling kuat
+  "konsep",                    // 31. C4 aras air rendah
+  "konsep",                    // 32. C4 susun gelas
+];
+if(TAG.length!==Q.length) console.warn("TAG tidak sama bilangan dengan soalan:",TAG.length,Q.length);
+Q.forEach((q,k)=>{const t=TAG[k]||"konsep";q.j=Array.isArray(t)?t[0]:t;q.t=Array.isArray(t)?(t[1]||null):null;});
 
 /* ===== STATE ===== */
 let i=0,score=0,hintUsed=false,checked=false,sel=null,results=[],muted=false;
@@ -857,6 +1017,7 @@ function check(){
     frac=good/q.bars.length;
   }
   const got=q.m*frac;score+=got;results.push(frac);
+  REKOD.catat(i+1,got,q.m,REKOD.jenis({frac,j:q.j,t:q.t,pilih:q.type==="mcq"?sel:null}));
   $("scoreNow").textContent=Math.round(score);
   $("hintBtn").disabled=true;
 
@@ -890,7 +1051,7 @@ function finish(){
    <div style="font-size:26px;font-weight:700">${msg}</div>
    <div class="dots">${results.map((f,k)=>`<span style="background:${f===1?"var(--ok)":f>0?"#f0a020":"var(--bad)"}">${k+1}</span>`).join("")}</div>
    <div class="sub" style="margin-top:12px">🟢 Betul &nbsp; 🟡 Separuh &nbsp; 🔴 Perlu ulang kaji</div>`;
-  if(st>=2)confetti(120);SFX.end();window.scrollTo({top:0,behavior:"smooth"});
+  if(st>=2)confetti(120);SFX.end();e.appendChild(REKOD.selesai(s));window.scrollTo({top:0,behavior:"smooth"});
 }
 </script>
 </body>

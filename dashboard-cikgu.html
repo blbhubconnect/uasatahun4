@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rekod Markah Cikgu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#213a7c;--blue:#0b52c4;--lav:#d0d9ff;--lav2:#eef1ff;--ink:#111;--paper:#fff;--muted:#4a4f7a;
+  --gold:#fff1a8;--gold-d:#e0b100;
+  --kec:#f59e0b;--kon:#7c3aed;--fak:#0891b2;
+  --ok:#16a34a;--mid:#f0a020;--bad:#e11d48;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Fredoka",system-ui,sans-serif;background:var(--navy);color:var(--ink);font-size:17px;line-height:1.4}
+button,input,select{font:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 60px}
+h1{color:#fff;font-size:34px;margin:4px 0 2px}
+.lead{color:var(--lav);margin:0 0 18px;font-weight:500}
+.kad{background:var(--paper);border:3px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink);padding:18px 20px;margin-bottom:22px}
+.kad h2{margin:0 0 12px;font-size:23px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kad h2 small{font-size:15px;font-weight:500;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row > *{min-width:0}
+input,select{border:3px solid var(--ink);border-radius:14px;padding:8px 12px;background:#fff}
+input{flex:1 1 220px}
+.btn{border:3px solid var(--ink);border-radius:14px;padding:8px 16px;font-weight:600;cursor:pointer;background:var(--lav);box-shadow:0 4px 0 var(--ink)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn.pri{background:#22c55e;color:#fff}
+.btn.ghost{background:#fff}
+.note{font-size:14px;color:var(--muted);margin-top:8px}
+.msg{margin-top:10px;font-weight:600}
+.msg.err{color:var(--bad)}
+.demo-banner{background:#ffe4b5;border:3px dashed var(--ink);border-radius:14px;padding:8px 14px;font-weight:600;margin-bottom:14px;display:none}
+details.set > summary{cursor:pointer;font-weight:700;font-size:20px;list-style:none}
+details.set > summary::-webkit-details-marker{display:none}
+details.set[open] > summary{margin-bottom:12px}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.tile{background:var(--lav2);border:3px solid var(--ink);border-radius:18px;padding:12px 16px;box-shadow:0 5px 0 var(--ink)}
+.tile b{display:block;font-size:34px;line-height:1.1}
+.tile span{color:var(--muted);font-weight:600;font-size:15px}
+
+/* jadual */
+.tbl-wrap{overflow-x:auto;border:3px solid var(--ink);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:760px;background:#fff}
+th,td{padding:9px 12px;text-align:left;border-bottom:2px solid #e3e6f5;white-space:nowrap}
+th{background:var(--lav);font-weight:700;position:sticky;top:0;cursor:pointer;user-select:none}
+th.num,td.num{text-align:center}
+tr.best td{background:var(--gold);font-weight:600}
+tr.best td:first-child{box-shadow:inset 6px 0 0 var(--gold-d)}
+.skor{display:inline-block;min-width:58px;text-align:center;padding:2px 10px;border-radius:999px;color:#fff;font-weight:700}
+.chip{display:inline-block;min-width:30px;text-align:center;padding:1px 8px;border-radius:999px;font-weight:700;color:#fff}
+.chip.z{background:#e5e7eb;color:#6b7280}
+.k{background:var(--kec)}.c{background:var(--kon)}.f{background:var(--fak)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:15px;font-weight:600;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:5px;vertical-align:-2px}
+.empty{padding:26px;text-align:center;color:var(--muted);font-weight:600}
+
+/* kelemahan */
+.murid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.murid{border:3px solid var(--ink);border-radius:18px;padding:14px 16px;background:var(--lav2)}
+.murid h3{margin:0;font-size:20px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.murid h3 small{font-size:14px;color:var(--muted);font-weight:600;white-space:nowrap}
+.meta{font-size:14px;color:var(--muted);font-weight:600;margin:2px 0 10px}
+.stack{display:flex;height:22px;border:2px solid var(--ink);border-radius:999px;overflow:hidden;background:#fff}
+.stack div{height:100%}
+.bars{display:grid;gap:6px;margin-top:10px}
+.bar{display:grid;grid-template-columns:86px 1fr 34px;gap:8px;align-items:center;font-size:15px;font-weight:600}
+.bar .t{height:14px;border-radius:999px;background:#fff;border:2px solid var(--ink);overflow:hidden}
+.bar .t i{display:block;height:100%}
+.utama{margin-top:10px;padding:8px 12px;border-radius:12px;background:#fff;border:2px solid var(--ink);font-size:15px}
+.utama b{font-size:16px}
+.qlist{font-size:14px;color:var(--muted);margin-top:6px}
+.trend{font-weight:700}
+.trend.up{color:var(--ok)}.trend.down{color:var(--bad)}
+@media (max-width:620px){h1{font-size:27px}.murid-grid{grid-template-columns:1fr}.tile b{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📊 Rekod Markah Latihan Tahun 4</h1>
+  <p class="lead">Jejak markah setiap cubaan murid · 🏆 markah tertinggi di-highlight · kenal pasti kelemahan: kecuaian, konsep, fakta</p>
+
+  <div class="kad">
+    <details class="set" id="setBox">
+      <summary>⚙️ Tetapan sambungan Google Sheet</summary>
+      <div class="row">
+        <input id="url" placeholder="URL Web App Apps Script (…/exec)">
+        <input id="kunci" placeholder="Kunci cikgu" type="password" style="flex:0 1 220px">
+        <button class="btn pri" id="sambung">Sambung</button>
+      </div>
+      <div class="note">Disimpan dalam browser ini sahaja. Kunci mesti sama dengan <b>KUNCI_CIKGU</b> dalam Code.gs.</div>
+    </details>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="muat">🔄 Muat semula</button>
+      <button class="btn ghost" id="demo">👀 Cuba data contoh</button>
+      <button class="btn ghost" id="csv">⬇️ Muat turun CSV</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="demo-banner" id="demoBanner">⚠️ Ini DATA CONTOH sahaja untuk lihat rupa dashboard. Tekan “Muat semula” untuk data sebenar.</div>
+
+  <div class="kad">
+    <div class="row">
+      <select id="fSub" aria-label="Subjek">
+        <option value="">📚 Semua subjek</option>
+        <option>Bahasa Melayu</option><option>Bahasa Inggeris</option><option>Matematik</option><option>Sains</option>
+      </select>
+      <input id="fNama" placeholder="🔍 Cari nama murid">
+      <select id="fSusun" aria-label="Susun">
+        <option value="masa">Terbaru dahulu</option>
+        <option value="markah">Markah tertinggi dahulu</option>
+        <option value="nama">Nama (A–Z)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="kad">
+    <h2>🗂️ Rekod setiap cubaan <small>Baris kuning 🏆 = markah tertinggi murid itu bagi subjek tersebut</small></h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th data-s="masa">Tarikh & Masa</th><th data-s="nama">Nama</th><th>Subjek</th>
+        <th class="num">Cubaan</th><th class="num" data-s="markah">Markah</th>
+        <th class="num">Kecuaian</th><th class="num">Konsep</th><th class="num">Fakta</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <div class="legend"><span><i class="k"></i>Kecuaian</span><span><i class="c"></i>Konsep</span><span><i class="f"></i>Fakta</span><span>Nombor = bilangan soalan salah</span></div>
+  </div>
+
+  <div class="kad">
+    <h2>🔎 Kelemahan murid <small>Gabungan semua cubaan yang ditapis</small></h2>
+    <div class="murid-grid" id="murid"></div>
+  </div>
+</div>
+
+<script>
+const JENIS={kecuaian:{lbl:"Kecuaian",cls:"k",col:"var(--kec)",tip:"Galakkan baca soalan 2 kali & semak semula sebelum tekan Semak."},
+             konsep:{lbl:"Konsep",cls:"c",col:"var(--kon)",tip:"Ulang ajar konsep dengan contoh mudah & latihan berperingkat."},
+             fakta:{lbl:"Fakta",cls:"f",col:"var(--fak)",tip:"Ulang kaji fakta / rujuk semula bahan & petikan."}};
+const SINGKAT={"Bahasa Melayu":"BM","Bahasa Inggeris":"BI","Matematik":"MT","Sains":"SN"};
+const $=id=>document.getElementById(id);
+const store={get(k){try{return localStorage.getItem("cikgu_"+k)||""}catch(e){return""}},set(k,v){try{localStorage.setItem("cikgu_"+k,v)}catch(e){}}};
+let DATA=[],demo=false;
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const kunciMurid=r=>r.nama.trim().toLowerCase()+"|"+r.subjek;
+const warnaSkor=m=>m>=80?"var(--ok)":m>=50?"var(--mid)":"var(--bad)";
+const tarikh=s=>{const d=new Date(s);return isNaN(d)?esc(s):d.toLocaleString("ms-MY",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})};
+
+/* ---------- ambil data (JSONP: jalan dari fail tempatan atau mana-mana hosting) ---------- */
+function ambil(){
+  const url=store.get("url").trim(),kunci=store.get("kunci");
+  if(!/^https:\/\/script\.google\.com\/.+\/exec/.test(url)){mesej("Isi URL Web App (berakhir dengan /exec) dalam Tetapan.",true);$("setBox").open=true;return}
+  mesej("⏳ Memuatkan…");
+  const cb="terima_"+Date.now(),s=document.createElement("script");
+  const habis=setTimeout(()=>{bersih();mesej("Tak dapat sambung. Semak URL, akses Web App (Anyone) & internet.",true)},20000);
+  function bersih(){clearTimeout(habis);delete window[cb];s.remove()}
+  window[cb]=res=>{bersih();
+    if(!res||!res.ok){mesej(res&&res.ralat==="kunci salah"?"Kunci cikgu salah.":"Ralat: "+(res&&res.ralat||"tiada data"),true);return}
+    demo=false;DATA=res.rekod||[];$("demoBanner").style.display="none";
+    mesej(`✅ ${DATA.length} rekod dimuatkan · ${new Date().toLocaleTimeString("ms-MY")}`);lukis()};
+  s.onerror=()=>{bersih();mesej("Tak dapat sambung. Semak URL & tetapan akses Web App.",true)};
+  s.src=url+"?kunci="+encodeURIComponent(kunci)+"&callback="+cb;
+  document.body.appendChild(s);
+}
+function mesej(t,err){const m=$("msg");m.textContent=t;m.className="msg"+(err?" err":"")}
+
+/* ---------- lukis ---------- */
+function lukis(){
+  const fSub=$("fSub").value,fNama=$("fNama").value.trim().toLowerCase(),susun=$("fSusun").value;
+  // markah tertinggi setiap murid+subjek (ikut SEMUA data)
+  const best={};
+  DATA.forEach((r,k)=>{const key=kunciMurid(r);if(!(key in best)||r.markah>DATA[best[key]].markah)best[key]=k});
+  const bestIdx=new Set(Object.values(best));
+  let rows=DATA.map((r,k)=>({...r,_k:k})).filter(r=>(!fSub||r.subjek===fSub)&&(!fNama||r.nama.toLowerCase().includes(fNama)));
+  rows.sort(susun==="markah"?(a,b)=>b.markah-a.markah||new Date(b.masa)-new Date(a.masa)
+          :susun==="nama"?(a,b)=>a.nama.localeCompare(b.nama)||a.subjek.localeCompare(b.subjek)||a.cubaan-b.cubaan
+          :(a,b)=>new Date(b.masa)-new Date(a.masa));
+
+  // tiles
+  const murid=new Set(rows.map(r=>r.nama.trim().toLowerCase()));
+  const purata=rows.length?Math.round(rows.reduce((s,r)=>s+r.markah,0)/rows.length):0;
+  const top=rows.reduce((a,r)=>!a||r.markah>a.markah?r:a,null);
+  $("tiles").innerHTML=[
+    [rows.length,"Jumlah cubaan"],[murid.size,"Bilangan murid"],[rows.length?purata+"%":"–","Purata markah"],
+    [top?top.markah+"%":"–",top?"👑 Tertinggi: "+esc(top.nama)+(fSub?"":" ("+SINGKAT[top.subjek]+")"):"Markah tertinggi"]
+  ].map(([b,s])=>`<div class="tile"><b>${b}</b><span>${s}</span></div>`).join("");
+
+  // jadual
+  const chip=(n,c)=>`<span class="chip ${n?c:"z"}">${n||0}</span>`;
+  $("tbody").innerHTML=rows.length?rows.map(r=>{const b=bestIdx.has(r._k);
+    return `<tr class="${b?"best":""}"><td>${tarikh(r.masa)}</td><td>${b?"🏆 ":""}${esc(r.nama)}</td><td>${esc(r.subjek)}</td>
+      <td class="num">${r.cubaan||"–"}</td><td class="num"><span class="skor" style="background:${warnaSkor(r.markah)}">${r.markah}%</span></td>
+      <td class="num">${chip(r.kecuaian,"k")}</td><td class="num">${chip(r.konsep,"c")}</td><td class="num">${chip(r.fakta,"f")}</td></tr>`}).join("")
+    :`<tr><td colspan="8" class="empty">${DATA.length?"Tiada rekod sepadan dengan tapisan.":"Belum ada rekod. Sambung Google Sheet atau cuba data contoh."}</td></tr>`;
+
+  // kelemahan setiap murid
+  const kump={};
+  rows.forEach(r=>{const k=r.nama.trim().toLowerCase();(kump[k]=kump[k]||{nama:r.nama,rec:[]}).rec.push(r)});
+  const kad=Object.values(kump).sort((a,b)=>a.nama.localeCompare(b.nama)).map(m=>{
+    const tot={kecuaian:0,konsep:0,fakta:0},soalan={kecuaian:{},konsep:{},fakta:{}};
+    m.rec.forEach(r=>(r.butiran||[]).forEach(b=>{if(!tot.hasOwnProperty(b.j))return;tot[b.j]++;
+      const id=(fSub?"":SINGKAT[r.subjek]+" ")+"S"+b.no;soalan[b.j][id]=(soalan[b.j][id]||0)+1}));
+    // rekod lama tanpa butiran: guna kiraan lajur
+    if(!m.rec.some(r=>(r.butiran||[]).length))m.rec.forEach(r=>{tot.kecuaian+=r.kecuaian||0;tot.konsep+=r.konsep||0;tot.fakta+=r.fakta||0});
+    const jum=tot.kecuaian+tot.konsep+tot.fakta;
+    const ikutMasa=[...m.rec].sort((a,b)=>new Date(a.masa)-new Date(b.masa));
+    const terbaik=Math.max(...m.rec.map(r=>r.markah));
+    let trend="";
+    if(ikutMasa.length>1&&new Set(m.rec.map(r=>r.subjek)).size===1){const d=ikutMasa[ikutMasa.length-1].markah-ikutMasa[0].markah;
+      trend=`<span class="trend ${d>0?"up":d<0?"down":""}">${d>0?"▲ +":d<0?"▼ ":"● "}${d}</span> sejak cubaan pertama`}
+    const utama=jum?Object.keys(tot).sort((a,b)=>tot[b]-tot[a])[0]:null;
+    const seri=utama&&Object.keys(tot).filter(j=>tot[j]===tot[utama]);
+    const sub=[...new Set(m.rec.map(r=>SINGKAT[r.subjek]))].join(", ");
+    const top3=j=>Object.entries(soalan[j]).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([id,n])=>id+(n>1?` (${n}×)`:"")).join(", ");
+    return `<div class="murid">
+      <h3><span>${esc(m.nama)}</span><small>🏆 ${terbaik}%</small></h3>
+      <div class="meta">${m.rec.length} cubaan · ${sub}${trend?" · "+trend:""}</div>
+      ${jum?`<div class="stack" title="Taburan soalan salah">${Object.keys(tot).map(j=>tot[j]?`<div style="width:${tot[j]/jum*100}%;background:${JENIS[j].col}"></div>`:"").join("")}</div>
+      <div class="bars">${Object.keys(tot).map(j=>`<div class="bar"><span>${JENIS[j].lbl}</span><span class="t"><i style="width:${tot[j]/jum*100}%;background:${JENIS[j].col}"></i></span><span>${tot[j]}</span></div>`).join("")}</div>
+      <div class="utama">🎯 Kelemahan utama: <b style="color:${JENIS[utama].col}">${seri.map(j=>JENIS[j].lbl).join(" & ")}</b><br>${JENIS[utama].tip}
+        ${top3(utama)?`<div class="qlist">Soalan kerap salah: ${top3(utama)}</div>`:""}</div>`
+      :`<div class="utama">🌟 Tiada soalan salah. Hebat!</div>`}
+    </div>`});
+  $("murid").innerHTML=kad.length?kad.join(""):`<div class="empty">Tiada data.</div>`;
+}
+
+/* ---------- CSV ---------- */
+function csv(){
+  if(!DATA.length){mesej("Tiada data untuk dimuat turun.",true);return}
+  const q=v=>`"${String(v).replace(/"/g,'""')}"`;
+  const lines=[["Tarikh & Masa","Nama","Subjek","Cubaan","Markah (%)","Kecuaian","Konsep","Fakta"].map(q).join(",")]
+    .concat(DATA.map(r=>[tarikh(r.masa),r.nama,r.subjek,r.cubaan,r.markah,r.kecuaian,r.konsep,r.fakta].map(q).join(",")));
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+lines.join("\n")],{type:"text/csv"}));
+  a.download="rekod-markah-tahun4.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* ---------- data contoh (palsu, untuk pratonton sahaja) ---------- */
+function dataContoh(){
+  const N={"Bahasa Melayu":17,"Bahasa Inggeris":25,"Matematik":20,"Sains":32};
+  const murid=[["Murid Contoh A",[.7,.15,.15]],["Murid Contoh B",[.15,.7,.15]],["Murid Contoh C",[.15,.15,.7]],["Murid Contoh D",[.34,.33,.33]]];
+  let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
+  const out=[],now=Date.now();
+  murid.forEach(([nama,w],mi)=>Object.keys(N).forEach((sub,si)=>{
+    const cub=1+Math.floor(rnd()*3);
+    for(let c=1;c<=cub;c++){
+      const salahBil=Math.max(0,Math.round(N[sub]*(0.45-c*0.1+rnd()*0.15)));
+      const pilih=[...Array(N[sub]).keys()].sort(()=>rnd()-.5).slice(0,salahBil);
+      const m=100/N[sub],but=[];let markah=100,t={kecuaian:0,konsep:0,fakta:0};
+      [...Array(N[sub]).keys()].forEach(k=>{let j="";if(pilih.includes(k)){const x=rnd();j=x<w[0]?"kecuaian":x<w[0]+w[1]?"konsep":"fakta";t[j]++;markah-=m}
+        but.push({no:String(k+1),g:j?0:m,m,j})});
+      out.push({masa:new Date(now-((3-c)*4+si+mi*0.3)*86400000).toISOString(),nama,subjek:sub,markah:Math.max(0,Math.round(markah)),cubaan:c,...t,butiran:but});
+    }}));
+  return out;
+}
+
+/* ---------- mula ---------- */
+$("url").value=store.get("url");$("kunci").value=store.get("kunci");
+$("sambung").onclick=()=>{store.set("url",$("url").value.trim());store.set("kunci",$("kunci").value);ambil()};
+$("muat").onclick=ambil;
+$("demo").onclick=()=>{demo=true;DATA=dataContoh();$("demoBanner").style.display="block";mesej("");lukis()};
+$("csv").onclick=csv;
+["fSub","fNama","fSusun"].forEach(id=>$(id).addEventListener("input",lukis));
+document.querySelectorAll("th[data-s]").forEach(th=>th.onclick=()=>{$("fSusun").value=th.dataset.s;lukis()});
+lukis();
+if(store.get("url"))ambil();else $("setBox").open=true;
+</script>
+</body>
+</html>

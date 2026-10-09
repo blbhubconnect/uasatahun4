@@ -186,6 +186,12 @@ button{font-family:inherit}
 :root{--green:#2ec4b6;--green-d:#1a9e92;--red:#ef476f;--pink:#ff5d8f;--yellow:#ffbe0b;--purple:#8338ec;--orange:#fb8500}
 .stim.vis{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;max-height:none;background:var(--lav)}
 .stim.vis svg{max-width:100%;height:auto;background:#fff;border-radius:16px;border:3px solid var(--ink)}
+.stim.vis img.rajah{display:block;margin:0 auto;width:auto;height:auto;max-width:100%;max-height:420px;
+  background:#fff;border-radius:16px;border:3px solid var(--ink);padding:10px;object-fit:contain}
+.stim.vis img.rajah-q10,.stim.vis img.rajah-b2b{max-height:300px}
+.mbox{display:inline-flex;flex-wrap:wrap;gap:2px;align-items:center;justify-content:center;min-width:90px;min-height:56px;padding:4px 10px;
+  border:4px dashed var(--ink);border-radius:14px;background:#fff;font-size:28px;line-height:1}
+@media (max-width:560px){.stim.vis img.rajah{max-height:300px;padding:6px}}
 .answers{display:flex;flex-direction:column;gap:14px;align-items:stretch}
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;font-size:28px;font-weight:600;
   padding:10px 14px;border-radius:24px;border:5px solid var(--c1);background:var(--lav2);transition:background .2s}
@@ -429,6 +435,117 @@ table.t th{background:var(--lav2)}
 </script>
 <!-- ===== /BUNYI-KIT ===== -->
 
+<!-- ===== REKOD-KIT: nama murid + rekod markah + hantar ke Google Sheet cikgu ===== -->
+<style>
+.rk-back{position:fixed;inset:0;z-index:10000;background:rgba(15,23,60,.72);display:flex;align-items:center;justify-content:center;padding:16px;animation:rkFade .25s both}
+.rk-box{background:#fffbea;border:5px solid #111;border-radius:30px;box-shadow:0 12px 0 #111;padding:22px 26px 26px;width:100%;max-width:560px;text-align:center;font-family:inherit;animation:rkPop .45s both}
+.rk-box .rk-emo{font-size:76px;line-height:1;display:inline-block;animation:rkFloat 2.4s ease-in-out infinite}
+.rk-box h2{font-size:38px;margin:6px 0 14px;line-height:1.15}
+.rk-box input{width:100%;font:inherit;font-size:32px;font-weight:600;text-align:center;padding:12px 14px;border:4px solid #111;border-radius:20px;background:#fff;outline:none}
+.rk-box input:focus{box-shadow:0 0 0 5px #ffd23f}
+.rk-box .rk-go{margin-top:18px;width:100%;font:inherit;font-size:40px;font-weight:700;color:#fff;background:#22c55e;border:4px solid #111;border-radius:22px;padding:6px 14px 10px;box-shadow:0 6px 0 #118a3e;cursor:pointer}
+.rk-box .rk-go:disabled{opacity:.45;cursor:not-allowed}
+.rk-box .rk-go:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #118a3e}
+.rk-box.rk-shake{animation:rkShake .45s}
+.rk-status{margin:16px auto 0;max-width:560px;background:#fffbea;border:4px solid #111;border-radius:20px;padding:8px 16px;font-size:22px;font-weight:600;text-align:center}
+@keyframes rkFade{from{opacity:0}}
+@keyframes rkPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes rkFloat{50%{transform:translateY(-8px)}}
+@keyframes rkShake{20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+@media (max-width:620px){.rk-box h2{font-size:30px}.rk-box input{font-size:26px}.rk-box .rk-go{font-size:32px}.rk-box .rk-emo{font-size:60px}}
+</style>
+<script>
+(function(){
+  /* ============ TETAPAN CIKGU ============
+     Tampal URL Web App Apps Script di bawah (berakhir dengan /exec).
+     Kalau kosong, latihan tetap jalan tapi markah tidak dihantar. */
+  const REKOD_URL = "TAMPAL_URL_APPS_SCRIPT_DI_SINI";
+  /* ======================================= */
+
+  const SUBJEK = "Matematik";
+  const BAHASA = "ms"; // "ms" atau "en"
+  const T = BAHASA==="en"
+    ? {tanya:"What is your name?",ph:"Type your full name",go:"Let's go! 🚀",ok:"📨 Your score has been sent to your teacher!",q:"📶 No internet. Your score will be sent next time.",hi:"Well done"}
+    : {tanya:"Siapa nama kamu?",ph:"Tulis nama penuh",go:"Jom Mula! 🚀",ok:"📨 Markah kamu sudah dihantar kepada cikgu!",q:"📶 Tiada internet. Markah akan dihantar kemudian.",hi:"Tahniah"};
+  const QKEY="rekod_baris_tertunda";
+  let nama="", butiran=[], mulaMasa=null, dihantar=false;
+  const adaURL=()=>/^https:\/\/script\.google(usercontent)?\.com\//.test(REKOD_URL);
+
+  function bersih(s){return String(s||"").replace(/[<>]/g,"").replace(/\s+/g," ").trim().slice(0,60)
+    .toLowerCase().replace(/(^|\s|-)(\S)/g,(m,a,b)=>a+b.toUpperCase())
+    .replace(/(^|\s)(Bin|Binti|Bt|A\/l|A\/p)(?=\s|$)/g,(m,a,b)=>a+b.toLowerCase())}
+
+  /* --- skrin nama --- */
+  function mula(fn){
+    const back=document.createElement("div");back.className="rk-back";
+    back.innerHTML=`<form class="rk-box" autocomplete="off"><span class="rk-emo">🧒</span><h2>${T.tanya}</h2>
+      <input id="rkNama" maxlength="60" placeholder="${T.ph}" aria-label="${T.tanya}">
+      <button class="rk-go" type="submit" disabled>${T.go}</button></form>`;
+    document.body.appendChild(back);
+    const f=back.querySelector("form"),inp=back.querySelector("input"),b=back.querySelector("button");
+    inp.addEventListener("input",()=>{b.disabled=bersih(inp.value).length<2});
+    f.addEventListener("submit",e=>{e.preventDefault();
+      const n=bersih(inp.value);
+      if(n.length<2){f.classList.remove("rk-shake");void f.offsetWidth;f.classList.add("rk-shake");return}
+      nama=n;butiran=[];dihantar=false;mulaMasa=new Date();back.remove();fn&&fn();});
+    setTimeout(()=>inp.focus(),80);
+  }
+
+  /* --- kenal pasti jenis kesilapan ---
+     frac   : bahagian markah yang diperoleh (0–1)
+     j      : jenis lalai soalan ("kecuaian" | "konsep" | "fakta")
+     t      : jenis khas ikut pilihan salah, cth {2:"kecuaian"}
+     pilih  : indeks pilihan murid (soalan aneka pilihan)
+     hampir : true kalau jawapan hampir tepat (cth 1 huruf / 1 digit salah)
+     Peraturan: separuh markah atau lebih / hampir tepat → kecuaian. */
+  function jenis(o){
+    if(o.frac>=1) return "";
+    if(o.frac>=0.5||o.hampir) return "kecuaian";
+    if(o.t&&o.pilih!=null&&o.t[o.pilih]) return o.t[o.pilih];
+    return o.j||"konsep";
+  }
+
+  function catat(no,got,max,jenisSalah){
+    butiran.push({no:String(no),g:Math.round(got*100)/100,m:max,j:jenisSalah||""});
+  }
+
+  /* --- hantar --- */
+  function hantarSatu(baris){
+    return fetch(REKOD_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(baris)});
+  }
+  function tertunda(){try{return JSON.parse(localStorage.getItem(QKEY)||"[]")}catch(e){return[]}}
+  function simpanTertunda(a){try{localStorage.setItem(QKEY,JSON.stringify(a.slice(-50)))}catch(e){}}
+  async function hantarTertunda(){
+    if(!adaURL()||!navigator.onLine)return;
+    const a=tertunda();if(!a.length)return;
+    const baki=[];
+    for(const r of a){try{await hantarSatu(r)}catch(e){baki.push(r)}}
+    simpanTertunda(baki);
+  }
+
+  /* dipanggil di skrin keputusan: pulangkan elemen status untuk dipaparkan */
+  function selesai(markah){
+    const el=document.createElement("div");el.className="rk-status";
+    if(!nama){el.remove();return el}
+    el.textContent=`${T.hi}, ${nama}! 🎉`;
+    if(dihantar||!adaURL())return el;
+    dihantar=true;
+    const baris={versi:1,nama,subjek:SUBJEK,markah:Math.round(markah),
+      mula:mulaMasa?mulaMasa.toISOString():"",tamat:new Date().toISOString(),butiran};
+    const papar=t=>{el.innerHTML=`${T.hi}, ${nama}! 🎉<br>${t}`};
+    if(!navigator.onLine){simpanTertunda([...tertunda(),baris]);papar(T.q);return el}
+    hantarSatu(baris).then(()=>papar(T.ok)).catch(()=>{simpanTertunda([...tertunda(),baris]);papar(T.q)});
+    return el;
+  }
+
+  window.addEventListener("online",hantarTertunda);
+  window.addEventListener("load",()=>setTimeout(hantarTertunda,1500));
+  window.REKOD={mula,jenis,catat,selesai,get nama(){return nama}};
+})();
+</script>
+<!-- ===== /REKOD-KIT ===== -->
+
+
 <script>
 /* ========= TETAPAN GURU ========= */
 // true = jawapan betul + jalan kira dipaparkan bila murid salah. false = sembunyikan.
@@ -482,80 +599,25 @@ function colKey(p){const L=colLayout(p),ints=L.head.slice(0,L.W).filter(Boolean)
   return '<div class="pvkey">'+[...ints,...fr].map(v=>`${v[0]} = ${v[2]}`).join(' • ')+'</div>';}
 const colAns=p=>colLayout(p).ans.filter(c=>!c.dot&&c.v!=='').map(c=>c.v).join('');
 
-function octagonSVG(){
-  const cx=150,cy=125,R=95; let pts=[],ticks='';
-  for(let k=0;k<8;k++){const a=(22.5+45*k)*Math.PI/180;pts.push((cx+R*Math.cos(a)).toFixed(1)+','+(cy+R*Math.sin(a)).toFixed(1));}
-  for(let k=0;k<8;k++){const a=(45*k)*Math.PI/180,r1=79,r2=96;
-    ticks+=`<line x1="${(cx+r1*Math.cos(a)).toFixed(1)}" y1="${(cy+r1*Math.sin(a)).toFixed(1)}" x2="${(cx+r2*Math.cos(a)).toFixed(1)}" y2="${(cy+r2*Math.sin(a)).toFixed(1)}" stroke="#2b2d42" stroke-width="3"/>`;}
-  return `<svg viewBox="0 0 320 250" width="320"><polygon points="${pts.join(' ')}" fill="#ffe8f0" stroke="#ff5d8f" stroke-width="5"/>${ticks}
-  <text x="238" y="55" font-size="24" font-weight="800" fill="#2b2d42">4 cm</text></svg>`;
-}
-
-const VIS = {
-  q9: `<svg viewBox="0 0 420 175" width="420">
-    <rect x="20" y="30" width="200" height="110" fill="#e0f2ff" stroke="#3a86ff" stroke-width="5"/>
-    <path d="M20 50 h20 v-20 M200 30 v20 h20 M20 120 h20 v20 M220 120 h-20 v20" fill="none" stroke="#2b2d42" stroke-width="3"/>
-    <text x="46" y="128" font-size="28" font-weight="800" fill="#ef476f">q</text>
-    <polygon points="290,150 390,150 340,20" fill="#fff3c4" stroke="#fb8500" stroke-width="5"/>
-    <line x1="308.5" y1="82.5" x2="321.5" y2="87.5" stroke="#2b2d42" stroke-width="3"/>
-    <line x1="358.5" y1="87.5" x2="371.5" y2="82.5" stroke="#2b2d42" stroke-width="3"/>
-    <path d="M310 150 A20 20 0 0 0 297 131" fill="none" stroke="#2b2d42" stroke-width="3"/>
-    <path d="M370 150 A20 20 0 0 1 383 131" fill="none" stroke="#2b2d42" stroke-width="3"/>
-    <text x="312" y="140" font-size="28" font-weight="800" fill="#ef476f">r</text>
-  </svg>`,
-  q10: octagonSVG(),
-  q11: `<svg viewBox="0 0 480 220" width="480">
-    <rect x="70" y="80" width="190" height="60" fill="#e0f2ff" stroke="#3a86ff" stroke-width="5"/>
-    <text x="8" y="118" font-size="24" font-weight="800">6 cm</text>
-    <text x="158" y="178" font-size="30" font-weight="800" fill="#ef476f">k</text>
-    <polygon points="300,180 460,180 380,30" fill="#fff3c4" stroke="#fb8500" stroke-width="5"/>
-    <line x1="380" y1="30" x2="380" y2="180" stroke="#2b2d42" stroke-width="3" stroke-dasharray="8 6"/>
-    <text x="388" y="125" font-size="22" font-weight="800">12 cm</text>
-    <text x="350" y="212" font-size="24" font-weight="800">15 cm</text>
-    <line x1="333" y1="110" x2="347" y2="99" stroke="#2b2d42" stroke-width="3"/>
-    <line x1="413" y1="99" x2="427" y2="110" stroke="#2b2d42" stroke-width="3"/>
-  </svg>`,
-  q12: `<svg viewBox="0 0 400 240" width="400">
-    <g><rect x="40" y="90" width="120" height="140" rx="6" fill="#efe1ff" stroke="#8338ec" stroke-width="5"/>
-    <polygon points="40,90 70,55 130,55 160,90" fill="#d8c2ff" stroke="#8338ec" stroke-width="5"/>
-    <rect x="70" y="40" width="60" height="16" fill="#8338ec"/>
-    <text x="100" y="125" font-size="18" font-weight="800" text-anchor="middle">JUS ANGGUR</text>
-    <text x="100" y="175" font-size="40" text-anchor="middle">🍇</text>
-    <text x="100" y="218" font-size="28" font-weight="800" text-anchor="middle" fill="#ef476f">1 ℓ</text></g>
-    <g><rect x="210" y="60" width="160" height="170" rx="6" fill="#fff0db" stroke="#fb8500" stroke-width="5"/>
-    <polygon points="210,60 245,20 335,20 370,60" fill="#ffd9a8" stroke="#fb8500" stroke-width="5"/>
-    <rect x="255" y="6" width="70" height="16" fill="#fb8500"/>
-    <text x="290" y="100" font-size="22" font-weight="800" text-anchor="middle">JUS OREN</text>
-    <text x="290" y="160" font-size="48" text-anchor="middle">🍊</text>
-    <text x="290" y="215" font-size="26" font-weight="800" text-anchor="middle" fill="#ef476f">2 000 mℓ</text></g>
-  </svg>`,
-  b1a: `<table class="t"><tr><th>Bahan bacaan</th><th>Bilangan</th></tr>
-    <tr><td>📕 Novel</td><td>15</td></tr><tr><td>📰 Majalah</td><td style="color:#ef476f">?</td></tr>
-    <tr><td>📒 Komik</td><td>25</td></tr><tr><th>Jumlah</th><th>50</th></tr></table>`,
-  b1b: `<div class="book"><span class="e">📕</span>X<br><span style="color:#ef476f">? g</span></div>
-        <div class="book"><span class="e">📗</span>Y<br>950 g</div>
-        <div class="book"><span class="e">📘</span>Z<br>1 kg 730 g</div>`,
-  b1c: `<div class="book"><span class="e">📒📒📒<br>📒📒📒</span>6 buah buku latihan<br><span style="color:#ef476f;font-size:32px">RM54.00</span></div>`,
-  b1d: `<table class="t picto"><tr>
-     <td>📘📘<br>📘📘<br>📘📘<br>📘📘</td><td>📘📘<br>📘📘<br>📘📘</td><td id="marchCell"></td><td>📘📘<br>📘📘</td></tr>
-     <tr><td class="lbl">Januari</td><td class="lbl">Februari</td><td class="lbl">Mac</td><td class="lbl">April</td></tr></table>
-     <div style="width:100%;text-align:center;font-weight:800;font-size:24px">📘 = 2 buah buku</div>`,
-  b2a: `<svg viewBox="0 0 440 150" width="440">${[0,1].map(c=>{let s='';for(let r=0;r<2;r++)for(let k=0;k<3;k++)s+=`<rect x="${20+c*220+k*60}" y="${30+r*50}" width="60" height="50" fill="#ffe08a" stroke="#8a5a00" stroke-width="4"/><text x="${50+c*220+k*60}" y="${64+r*50}" font-size="22" text-anchor="middle">🍌</text>`;return s+`<text x="${110+c*220}" y="148" font-size="22" font-weight="800" text-anchor="middle">Kek ${c+1}</text>`}).join('')}</svg>`,
-  b2b: `<svg viewBox="0 0 360 200" width="360">
-    <rect x="50" y="20" width="260" height="130" fill="#ffe8f0" stroke="#ff5d8f" stroke-width="5"/>
-    <line x1="56" y1="172" x2="304" y2="172" stroke="#2b2d42" stroke-width="3"/>
-    <polygon points="50,172 62,165 62,179" fill="#2b2d42"/><polygon points="310,172 298,165 298,179" fill="#2b2d42"/>
-    <text x="180" y="198" font-size="24" font-weight="800" text-anchor="middle">25 cm</text></svg>`,
-  b2d: (()=>{const d=[['Isnin',45],['Selasa',30],['Rabu',null],['Khamis',35],['Jumaat',60]];
-    let s=`<svg viewBox="0 0 540 340" width="540"><text x="290" y="24" font-size="22" font-weight="800" text-anchor="middle">Jualan Kek</text>`;
-    for(let v=0;v<=60;v+=10){const y=290-v*4;s+=`<line x1="60" y1="${y}" x2="520" y2="${y}" stroke="#d6dcf0" stroke-width="2"/><text x="50" y="${y+7}" font-size="18" font-weight="700" text-anchor="end">${v}</text>`;}
-    s+=`<line x1="60" y1="290" x2="520" y2="290" stroke="#2b2d42" stroke-width="3"/><line x1="60" y1="40" x2="60" y2="290" stroke="#2b2d42" stroke-width="3"/>`;
-    d.forEach((b,i)=>{const cx=110+i*92;
-      if(b[1]!==null){const h=b[1]*4;s+=`<rect x="${cx-25}" y="${290-h}" width="50" height="${h}" fill="${['#3a86ff','#ff5d8f','','#2ec4b6','#ffbe0b'][i]}" stroke="#2b2d42" stroke-width="2"/>`;}
-      else s+=`<text x="${cx}" y="270" font-size="40" font-weight="800" text-anchor="middle" fill="#ef476f">?</text>`;
-      s+=`<text x="${cx}" y="316" font-size="18" font-weight="800" text-anchor="middle">${b[0]}</text>`;});
-    return s+`<text x="290" y="338" font-size="16" text-anchor="middle" fill="#5c6178">Hari</text></svg>`;})()
+/* ===== RAJAH dari kertas soalan (WebP) =====
+   Fail gambar mesti berada dalam folder ini, relatif kepada fail HTML. */
+const IMG_DIR = 'img/mt4-uasa/';
+const RAJAH = {
+  q9:'Rajah segi empat tepat dengan sudut q dan segi tiga sama kaki dengan sudut r',
+  q10:'Rajah oktagon sekata, sisi 4 cm',
+  q11:'Rajah segi empat tepat lebar 6 cm panjang k, dan segi tiga sama kaki tapak 15 cm tinggi 12 cm',
+  q12:'Rajah kotak jus anggur 1 liter dan jus oren 2 000 mililiter',
+  b1a:'Jadual koleksi bahan bacaan Sabrina: novel 15, majalah kosong, komik 25, jumlah 50',
+  b1b:'Rajah buku X, buku Y 950 g dan buku Z 1 kg 730 g',
+  b1c:'Rajah 6 buah buku latihan berharga RM54.00',
+  b1d:'Piktograf buku dipinjam Januari hingga April, lajur Mac kosong. Satu simbol mewakili 2 buah buku',
+  b2a:'Rajah kek pisang di Kedai Kek Qaisara',
+  b2b:'Rajah tapak loyang segi empat tepat, panjang 25 cm',
+  b2d:'Carta palang jualan kek Isnin hingga Jumaat, palang Rabu tidak ditunjukkan'
 };
+const VIS = Object.fromEntries(Object.entries(RAJAH).map(([k,alt])=>
+  [k,`<img class="rajah rajah-${k}" src="${IMG_DIR}${k}.webp" alt="${alt}" loading="lazy" decoding="async">`]));
+
 
 /* ========= SOALAN (dari kertas UASA Matematik Tahun 4) ========= */
 const Q = [
@@ -645,6 +707,36 @@ const Q = [
   sol:'Rabu = 30 → 45+30+30+35+60 = 200 → 30/200 × 100% = <b>15%</b>'}
 ];
 
+/* ===== TAG KELEMAHAN (untuk rekod cikgu) =====
+   Satu baris = satu soalan, ikut turutan.
+   "kecuaian" | "konsep" | "fakta"  = jenis kelemahan kalau murid salah soalan ini.
+   {indeks:"jenis"} = jenis khas kalau murid pilih pilihan itu (A=0, B=1, C=2, D=3).
+   Automatik: dapat separuh markah atau lebih / hampir tepat = kecuaian. */
+const TAG = [
+  "konsep",                    // 1. A1 43 685 + 2 319
+  "konsep",                    // 2. A2 140 × 3 ÷ 10
+  "konsep",                    // 3. A3 tambah pecahan
+  "konsep",                    // 4. A4 tambah perpuluhan
+  "konsep",                    // 5. A5 RM × 8
+  "fakta",                     // 6. A6 sistem 24 jam
+  "fakta",                     // 7. A7 abad → tahun
+  "konsep",                    // 8. A8 kg & g
+  "fakta",                     // 9. A9 nama sudut
+  "fakta",                     // 10. A10 perimeter oktagon (8 sisi)
+  "konsep",                    // 11. A11 luas, cari k
+  "konsep",                    // 12. A12 nisbah
+  "konsep",                    // 13. B1(a) peratus majalah
+  "konsep",                    // 14. B1(b) jisim buku X
+  "konsep",                    // 15. B1(c) wang cukup?
+  "konsep",                    // 16. B1(d) piktograf
+  "konsep",                    // 17. B2(a) baki kek
+  "konsep",                    // 18. B2(b) luas loyang
+  "konsep",                    // 19. B2(c) harga 12 potong
+  "konsep",                    // 20. B2(d) peratus jualan Rabu
+];
+if(TAG.length!==Q.length) console.warn("TAG tidak sama bilangan dengan soalan:",TAG.length,Q.length);
+Q.forEach((q,k)=>{const t=TAG[k]||"konsep";q.j=Array.isArray(t)?t[0]:t;q.t=Array.isArray(t)?(t[1]||null):null;});
+
 /* ========= BUNYI ========= */
 let AC=null;
 function tone(seq){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime;
@@ -670,7 +762,7 @@ function startScreen(){
     <div class="sub">Latihan Ujian Akhir Sesi • ${Q.length} soalan</div>
     <div class="steps"><span>📖 Baca soalan baik-baik</span><span>✏️ Cuba jawab sendiri</span><span>💡 1 petunjuk setiap soalan</span><span>✅ Semak sekali sahaja</span><span>🚀 Teruskan!</span></div>
     <button class="semak" id="go">Jom Mula! 🚀</button></div>`;
-  document.getElementById('go').onclick=()=>{SFX.begin();render();};
+  document.getElementById('go').onclick=()=>REKOD.mula(()=>{SFX.begin();render();});
 }
 
 function partHTML(p,i){
@@ -683,7 +775,7 @@ function partHTML(p,i){
   if(p.t==='select') mid=`<select class="ans"><option value="">— pilih —</option>${p.opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
   if(p.t==='choice') mid=p.opts.map(o=>`<button class="choice" data-v="${o}">${o}</button>`).join('');
   if(p.t==='col') return `<div class="row colrow" data-i="${i}">${colGrid(p,false)}${colKey(p)}</div>`;
-  if(p.t==='sym') mid=`<button class="step" data-d="-1">−</button><span class="cnt">0</span><button class="step" data-d="1">+</button>`;
+  if(p.t==='sym') mid=`<button class="step" data-d="-1">−</button><span class="cnt">0</span><button class="step" data-d="1">+</button><span class="mbox" id="marchCell"></span>`;
   return `<div class="row" data-i="${i}">${pre}${mid}${suf}</div>`;
 }
 
@@ -741,7 +833,7 @@ function render(){
       state[i].c=Math.max(0,Math.min(8,state[i].c+(+b.dataset.d)));
       r.querySelector('.cnt').textContent=state[i].c;
       const mc=document.getElementById('marchCell');
-      if(mc){let s='';for(let k=0;k<state[i].c;k++)s+='📘'+(k%2?'<br>':'');mc.innerHTML=s;}
+      if(mc){let s='';for(let k=0;k<state[i].c;k++)s+='📘';mc.innerHTML=s;}
       upd();});
   });
 
@@ -756,6 +848,8 @@ function render(){
     const nOk=ok.filter(Boolean).length, all=nOk===ok.length;
     const got=q.partial?Math.round(q.marks*nOk/ok.length):(all?q.marks:0);
     score+=got;results.push({q,got,all});
+    const digSalah=card.querySelectorAll('input.dig.nod').length;
+    REKOD.catat(q.sec+q.no,got,q.marks,REKOD.jenis({frac:all?1:got/q.marks,j:q.j,hampir:(!all&&nOk>0)||digSalah===1}));
     const fb=document.getElementById('fb');
     if(all){
       fb.innerHTML=`<span class="emo">🎉</span><span><span class="head">Betul! Hebat!</span>+${got}% ⭐</span>`;
@@ -808,6 +902,7 @@ function endScreen(){
    <div class="dots">${results.map(r=>`<span style="width:auto;padding:0 10px;background:${r.all?'var(--ok)':r.got>0?'#f0a020':'var(--bad)'}">${r.q.sec}${r.q.no} · ${r.got}/${r.q.marks}</span>`).join('')}</div></div>`;
   if(score>=50){confetti();setTimeout(confetti,500);}
   SFX.end();
+  app.querySelector('.hero').appendChild(REKOD.selesai(score));
 }
 
 startScreen();
